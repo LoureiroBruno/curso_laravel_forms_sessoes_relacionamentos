@@ -80,14 +80,72 @@ Route::post('/series/salvar', [SeriesController::class, 'store'])->name('storeSe
 
 agrupando:
 
-Route::controller(controller: SeriesController::class)->group(function () {
-    Route::get('/series','index')->name('indexSeries');
-    Route::get('/series/criar','create')->name('createSeries');
-    Route::post('/series/salvar','store')->name('storeSeries');
+Route::controller(SeriesController::class)->group(function () {
+    Route::get('/series','index')->name('series.index');
+    Route::get('/series/criar','create')->name('series.create');
+    Route::post('/series/salvar','store')->name('series.store');
 });
 
 não preciso mais informar a classe de forma resumda /nomedarota ,metodo
 
+também pode aplicar o uso dos nomes das rotas, para o return das views, ou return redirect das views mais com os nomes das rotas.
+exemplo:
+
+    public function create()
+    {
+        return view('series.create(arquivo_da_view)'); ou return view(route('series.index')) ou return view->route('series.index');
+    }
+
+
+public function store(Request $request)
+    {
+        $nomeSerie = $request->input('nome');
+        if ($nomeSerie != null) {
+            Serie::create($request->all());
+            return redirect('series(arquivo_da_view)') ou return redirect(route('series.index')) ou return redirect->route('series.index');
+        }...
+    }
+
+    com paramentros
+    return redirect('series')->with('success', 'Cadastro Realizado com Sucesso!'); ou return redirect()->route('series.index', ['success' => 'Cadastro Realizado com Sucesso!']);
+
+    /** função pertecente ao Laravel 9.0 em diante */
+    return to_route('series.index')->with('success', 'Cadastro Realizado com Sucesso!');
+
+## diferença entre
+
+/**
+ * Grupo SerieController
+ */
+// Route::controller(SeriesController::class)->group(function () {
+//     Route::get('/series','index')->name('series.index');
+//     Route::get('/series/create','create')->name('series.create');
+//     Route::post('/series/store','store')->name('series.store');
+// });
+
+
+e esse
+
+/**
+ * Grupo SerieController Recurso Route::Resource
+ */
+Route::resource('/series', SeriesController::class);
+
+quando a rota possui possui o mesmo padrão acrescentando um sufixo tipo, series ou series/create ou series strore, tendo a ideia de criar, salvar, deletar seguindo a ideia do crud
+para ficar um codigo mais enxuto, se seguir esse conceito
+
+
+Verb	URI	Action	Route Name
+GET	/photos	index	photos.index
+GET	/photos/create	create	photos.create
+POST	/photos	store	photos.store
+GET	/photos/{photo}	show	photos.show
+GET	/photos/{photo}/edit	edit	photos.edit
+PUT/PATCH	/photos/{photo}	update	photos.update
+DELETE	/photos/{photo}	destroy	photos.destroy
+
+tem um controlador com esse os nomes desse metodos index, create, show, edit, update e destroy, pode com uma linha no exepmlo Route::resource('/series', SeriesController::class);
+aplica as rotas, tendo que inserir apenas os nones das rotas nas actions do tipo href ou view ou redirect na referncia pra o controlador referenciado.
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ================================================================================================================================================================================

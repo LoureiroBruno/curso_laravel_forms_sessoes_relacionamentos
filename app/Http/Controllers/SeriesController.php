@@ -41,7 +41,8 @@ class SeriesController extends Controller
         $nomeSerie = $request->input('nome');
         if ($nomeSerie != null) {
             Serie::create($request->all());
-            return redirect('series')->with('success', 'Cadastro Realizado com Sucesso!');
+            /** função pertecente ao Laravel 9.0 em diante */
+            return to_route('series.index')->with('success', 'Cadastro Realizado com Sucesso!');
 
         } else {
             return redirect('series')->with('warning', 'AVISO! Preencher título da série campo nome');

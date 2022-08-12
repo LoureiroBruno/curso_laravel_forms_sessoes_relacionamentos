@@ -19,10 +19,6 @@ Route::get('/', function () {
 });
 
 /**
- * Grupo SerieController
+ * Grupo SerieController Recurso Route::Resource
  */
-Route::controller(controller: SeriesController::class)->group(function () {
-    Route::get('/series','index')->name('series.index');
-    Route::get('/series/create','create')->name('series.create');
-    Route::post('/series/store','store')->name('series.store');
-});
+Route::resource('/series', SeriesController::class);
