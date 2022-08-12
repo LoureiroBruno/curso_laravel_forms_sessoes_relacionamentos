@@ -19,8 +19,10 @@ Route::get('/', function () {
 });
 
 /**
- * rotas de acesso dominio
+ * Grupo SerieController
  */
-Route::get('/series', [SeriesController::class, 'index'])->name('indexSeries');
-Route::get('/series/criar', [SeriesController::class, 'create'])->name('createSeries');
-Route::post('/series/salvar', [SeriesController::class, 'store'])->name('storeSeries');
+Route::controller(controller: SeriesController::class)->group(function () {
+    Route::get('/series','index')->name('indexSeries');
+    Route::get('/series/criar','create')->name('createSeries');
+    Route::post('/series/salvar','store')->name('storeSeries');
+});

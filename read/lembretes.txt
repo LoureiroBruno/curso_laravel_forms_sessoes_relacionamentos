@@ -4,6 +4,12 @@ mod 01
 #
 
 -----------------------------------------------------------------------------------------------------------------------------------
+
+---------------------------------
+ 01
+---------------------------------
+
+
 ## vamos começar a aprender alguns detalhes do framework laravel, vamos atingir o mesmo resultado mas com um código um pouco mais sucinto.
 ## Além de utilizar o próprio método input, posso acessar diretamente a propriedade.
 exemplo:
@@ -54,6 +60,33 @@ deve ser implementado na classe da model relacionada o uso de filtros, em simpli
 
 com o uso dos metodos create(), alem de obter todos os parametros vindos do request, tambem pode usar como parametro o request->only(obtendo so os parametros desejados) e
 request->except(obter todos os paramentros menos o que foi passado aqui)
+
+---------------------------------
+ 02
+---------------------------------
+
+## Existem duas formas de agrupar. Uma, que já existe há algum tempo e já citamos, só que primeiro eu vou te mostrar uma forma que é nova na Laravel 9. Então, vamos dar uma olhada nela.
+Se eu tenho vários ações diferentes vinda de um mesmo controller, eu posso ter um Route:controller() agrupando.
+então Route::controller(controller:SeriesController::class)->group(function () {).
+Então dentro eu passo uma função anônima, e nessa função anônima posso ter todas as definições de rotas.
+exemplo:
+
+/**
+ * rotas de acesso dominio
+ */
+Route::get('/series', [SeriesController::class, 'index'])->name('indexSeries');
+Route::get('/series/criar', [SeriesController::class, 'create'])->name('createSeries');
+Route::post('/series/salvar', [SeriesController::class, 'store'])->name('storeSeries');
+
+agrupando:
+
+Route::controller(controller: SeriesController::class)->group(function () {
+    Route::get('/series','index')->name('indexSeries');
+    Route::get('/series/criar','create')->name('createSeries');
+    Route::post('/series/salvar','store')->name('storeSeries');
+});
+
+não preciso mais informar a classe de forma resumda /nomedarota ,metodo
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
