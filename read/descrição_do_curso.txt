@@ -1,1 +1,1 @@
-Laravel:criando uma aplicação com MVC
+Laravel:validando formulários, usando sessões e definindo relacionamentos

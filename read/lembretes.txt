@@ -1,446 +1,104 @@
 ================================================================================================================================================================================
 mod 01
 
-# Aprendemos o que é e para que serve um framework
-# Vimos diferentes formas de instalar o Laravel
-# Criamos uma rota usando Laravel
-# Vimos como o Laravel nos auxilia na investigação de erros
+#
 
 -----------------------------------------------------------------------------------------------------------------------------------
-##  Com essa forma de instalação, vamos ter tudo na nossa máquina mesmo, vamos executar o servidor na nossa máquina, sem utilizar nenhum container do Docker,
-ou coisa do tipo, então para isso vamos executar esse comando aqui, # composer create-project laravel/laravel nome-do-projeto
-##  a versão do Laravel no momento da gravação deste curso é a 9 para criar o projeto utilizando esta versão,
-basta informá-la # composer create-project --prefer-dist laravel/laravel laravel_criando_aplicacao "9.1.*" ou # composer create-project laravel/laravel teste ^9
-## ao rodar # php artisan - retorno de uma lista de funcionalidades
-## ao rodar # php artisan serve - startado o serviço equivalente ao # php -S localhaost:8000 -t public
-## caso necessário especificar um endereço diferente do padrão e a porta rodar # artisan serve --host=[qualquer_valor_ip] --port=[qualquer_valor_porta]
-## Dessa forma que estamos fazendo é subir um servidor web utilizando o servidor embutido do próprio PHP, só que aqui com algumas facilidades do Laravel,
-então ele já subiu para nós, já está nos redirecionando as requisições para o arquivo de configuração para o arquivo de Bootstrap do Laravel,
-então já está tudo configurado bonito, vamos lá, executar esse projeto
+## vamos começar a aprender alguns detalhes do framework laravel, vamos atingir o mesmo resultado mas com um código um pouco mais sucinto.
+## Além de utilizar o próprio método input, posso acessar diretamente a propriedade.
+exemplo:
+ao invés de usar => $resquest->input('name_vindo_http_post')
+pode usar => $resquest->name_vindo_http_post
 
-## quando acessa o arquivo web.php dentro a pasta routes, existe o arquivo de configuração das rotas do dominio.
-tem as configurações de rota, então repara que é bastante simples configurarmos uma rota, eu utilizo a classe Route:: o verbo http que eu espero receber essa requisição,
-no nosso caso aqui, como eu estou acessando direto do navegador, é get, se eu quisesse receber os dados de um formulário, seria post, se fosse uma API, eu posso utilizar todos os verbos http.
+então, se existe um campo "nome", vindo do ue está vindo no corpo da minha requisição, eu posso acessar diretamente a propriedade “Nome” do meu request.
+desta forma eu consigo também pegar um array associativo com todos os dados da requisição. Imagina que na série, além do nome, eu também tivesse uma sinopse, uma descrição,
+alguma coisa assim. Então, dessa forma, eu posso pegar todos os dados de uma vez, para adicionar na série.
+Inclusive, falando em adicionar vários campos ao mesmo tempo, se eu tivesse vários campos, eu precisaria ter o nome, a descrição, atores e todos os campos que eu tivesse.
+Só que o eloquent, que é o ORM do Laravel, já fornece uma forma de termos o que é chamado de mass assignment, ou atribuição em massa. Ou seja, preencher vários campos ao mesmo tempo.
+E isso podemos fazer através de Serie::create():
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Então toda model do eloquent possui esse método estático chamado create. E ele recebe por parâmetro um array associativo com todas as propriedades que eu quero armazenar, com todas
+as colunas de banco de dados que eu quero armazenar.
 
-Qual a sintaxe para criar uma nova rota no Laravel?
-## Route::verbo_http('{sua rota}', {Código_a_ser_executado});
+exemplo:Serie::crete:([‘nome’ => 'name_vindo_http_post']); => de forma uninátia.
+
+mas passamdo varios campos como citado no exemplo:
+Serie::create($request->all()); => todos os parametros recebidos do request.
+
+irá apresentar um erro pois
+Então, como estou pegando tudo que vem do usuário, eu estou fazendo alterações que eu não queria, eu queria, por exemplo, só alterar o e-mail desse meu usuário, ou criar um novo usuário
+só com nome e e-mail, sem esses dados de “admin”. Então, por isso ser perigoso, o Laravel obriga que informemos um detalhe.
+
+Sempre que eu for utilizar mass assignment (atribuição em massa) preciso informar na minha “model”, quais campos podem ser atribuídos dessa forma.
+Então, eu posso utilizar a propriedade fillable para isso, protected $fillable dentro da model usada, seguindo o exemplo model Serie.
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Serie extends Model
+{
+    use HasFactory;
+
+    protected $fillable =
+    [
+        'nome', neste caso irá ignorar tudo o que não estiver nesta lista de campo de permissão a alteração
+    ];
+}
+
+com isso ao usar o recurso do create() ao invés do save(), e ainda usando o create(pegando tudo o que vem do request ao inves de seguimentar o que pegar), ao usar create($request->all())
+deve ser implementado na classe da model relacionada o uso de filtros, em simplicar o codigo nos controllers mas mantendo na camada de segurança.
+
+com o uso dos metodos create(), alem de obter todos os parametros vindos do request, tambem pode usar como parametro o request->only(obtendo so os parametros desejados) e
+request->except(obter todos os paramentros menos o que foi passado aqui)
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+================================================================================================================================================================================
 ================================================================================================================================================================================
 mod 02
 
-# Criamos nosso primeiro controller
-# Aprendemos sobre nomes de ações no Laravel
-# Entendemos como Laravel lida com requisição e resposta
+#
+
+-----------------------------------------------------------------------------------------------------------------------------------
+##
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-## vamos lá começar a criar o nosso sistema de controle de séries e para isso o que eu quero fazer?
-então eu quero por exemplo, cadastrar as séries que eu já assisti, então vamos lá, eu vou criar aqui uma rota.
-primeiro vou fazer da forma manual, depois eu vou refazer de uma forma mais automatizada, então vamos lá, primeiro, eu vou vir aqui dentro de “app > Http > Controllers”,
-e vou criar uma nova classe, então essa classe vai chamar “SeriesController” ou dentro a pasta raiz do projeto # php artisan make:controller SeriesController
 
-## ntão vou ter uma lista de séries, que vai ser um array por exemplo $series = [];, e aqui dentro vou ter o nome de várias séries, por exemplo, ’Punisher’, ‘Lost’, ‘Grey\’s Anatomy’,
-eu tenho aqui uma lista com 3 séries, e eu quero exibir esses seriados na tela, dentro de uma lista por exemplo, então eu vou ter aqui
- um HTML de resultado $html = ‘<ul>’;, esse HTML, vai ter uma lista, então eu vou simplesmente exibir esse HTML echo $html, então vamos lá,
- vou fazer um foreach ($series as $serie) {}, e aqui esse HTML vai ter um item de lista, para cada uma das minhas séries eu vou ter “li”, $html .= “<li>$serie</li>”;,
- e aqui no final eu posso fechar o meu “ul”, $html .= ‘</ul>’;. de forma icorreta, mas para iniciar o entendimento.
-
-
-## Tenho um controller criado, não seguindo as melhores práticas, mas está criado, agora como eu faço para quando eu acessar essa URL, o controller ser executado? Então aqui o que eu preciso fazer?
-## retorna ao arquivo web dentro a pasta route adiconar a nova rota exemplificado.
-Route::get('/series', [SeriesController::class, 'listarSeries']);
-
-## pronto ao rodar # php artisan make:controller SeriesController, foi criado a classe controladora com o nome SeriesController, e extendendo da classe Controller.
-estamos ganhando algumas funcionalidades, estamos fazendo com que o nosso controller seja um controller do Laravel em si, e ele possui diversas funcionalidades que vão ser interessante
-no futuro, com o código que temos hoje, isso não é necessário, eu posso simplesmente apagar isso aqui, sem problema nenhum, que o nosso código continua funcionando,
-mas vamos deixar porque no futuro vamos utilizar algumas funcionalidades dessa superclasse controller.
-
-## E aqui se acessamos a documentação, de “Resource Controllers”, visto por exemplo em uma URL /photos utilizando o verbo get, no nosso caso verbo get URL /series, o nome da action,
-ou seja, do método do nosso controller, tende a ser index, esse é o padrão, tendemos a utilizar o nome index.
-Já utilizando o verbo get para /series/criar por exemplo, ou /series/create, utilizaríamos o método create, que vai ser o formulário de criar uma nova série e assim em diante,
-então esses aqui são os padrões para termos os nossos métodos, as nossas actions de um controller, então sempre que eu disser uma action, é um método de um controller.
-Então para começarmos a se habituar com esse padrão, vamos utilizar esses nomes aqui, então lá, ao invés utilizar public function listarSeries(),
-eu vou renomear para public function index(), então lá também na definição da rota, vamos utilizar index.
-
-## mas caso já sabia que irá utilizar todos os recursos e metodos do controlador, pode rodar # php artisan make:controller nomeDoControladorController --resource
-
-## porque que o Laravel já importou essa classe aqui use Illuminate\Http\Request?
-como que eu por exemplo receberia um ID de uma série?
-como que eu receberia os dados da minha requisição por exemplo?
-vamos entender melhor como o controller funciona antes de avançarmos com nosso projeto.
-Lembra lá no nosso treinamento de MVC, o nosso controller, a ação do nosso controller recebia por parâmetro uma requisição e retornava uma resposta,
-então isso é um comportamento que esperamos quando estamos falando de http, quando estamos falando de um controller recebemos uma requisição e devolvemos uma resposta e com Laravel
-podemos fazer exatamente isso.
-Até por isso quando criamos um controller a partir da linha de comando, essa classe já é importada, porque podemos receber por parâmetro, esse *request, essa requisição Request $request
-Então dessa forma conseguimos obter várias informações da requisição, por exemplo podemos pegar a URL, conseguimos pegar detalhes da query string, um input que viria de um formulário e etc.
-
-http://localhost:8000?id=1
-$request->get('id') vindo de um url
-
-name="id"
-$request->input('id') vindo de um formulario
-
-http://localhost/series
-$request->url()
-
-enquanto na resposta ao inves de utilizar
-# return new Response(200, ['Location' => header('Location: /login')], '');
-realizado no curso de mvc,
-pode ser realizado redirect('/login')
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+================================================================================================================================================================================
 ================================================================================================================================================================================
 mod 03
 
-# Separamos nosso Controller da View
-# Aprendemos a usar o Blade
-# Criamos um layout utilizando componentes Blade
-# Nos aprofundamos em funcionalidades do Blade
+#
+
+-----------------------------------------------------------------------------------------------------------------------------------
+##
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-## lateral esquerda em “Resources > Views”, aqui ficam os nossos arquivos de view, ou seja, os nossos artigos que vão montar o HTML
-## no momento de realizar o envio dos objetos ou variaveis, pode simplesmente enviar desta forma para a view:
 
-return view('cursos.listar-cursos', [
-    'series' => $series
-]);
-
-ou
-
-return view('cursos.listar-cursos', compact('series'));
-
-## ao abrir na view que temos quando inicializa o projeto do framework, ou seja, quando criamos um projeto do zero, temos essa extensão .blade.php
-Então o que é o blade?
-É basicamente uma template engine, que o Laravel utiliza, e o que é uma template engine?
-É um motor que nos ajuda, é um componente que nos ajuda a criar templates, a criar views, então com o blade, temos muitas facilidades na hora de escrever nossos códigos na view.
-
-dentro do metodo do index da classe controladora, varias formas de tratra no retorno para uma view
-
-  public function index()
-    {
-        $series = [
-            'Punisher',
-            'Lost',
-            'Grey\'s Anatomy'
-        ];
-
-        /** passando por array associativo */
-        // return view('cursos.listar-cursos', [
-        //     'series' => $series
-        // ]);
-
-        /** outra forma enxuta*/
-            // return view('cursos.listar-cursos', compact('series'));
-
-            /** envio para uma view do tipo php */
-                //  return view('cursos.listar-cursos', compact('series'));
-
-            /** envio para uma view do tipo blade.php */
-                // return view('cursos.listarCursos', compact('series'));
-
-        /** outra forma exuta com referencia envio */
-            return view('cursos.listarCursos')->with('series', $series);
-
-    }
-
-## interessante manter o mesmo padrão na forma de nomear os nomes do metodos dentro dos controllers, é  manter os menos nomes nas views.
-caso se houver por exemplo dois controles tipo series e filmes ambos com os metodos index, na view criar a pasta serie dentro dela index.blade.php e cria a pasta filme e dentro dela index.blade.php
-
-## na criação de uma arquivo layout padrão alterado apenas o content, cria a componentes no layout da pagina. marcando {{ $slot }} conteudo a ser inserido
-e na pagina a inserir a esturura, abrindo <x-layout> e fechanddo </x-layout> e tudo o que estiver dentro das tags será inserio no {{ slot }}
-
-<x-layout>
-    <x-slot:title>
-        Series
-    </x-slot>
-
-    @foreach ($series as $serie)
-        <li>{{ $serie }}</li>
-    @endforeach
-</x-layout>
-
-## E caso eu queira criar esse componente pela linha de comando # php artisan make:component Alerta
-
-## começamos a brincar um pouco mais com o blade
-notado quando eu aperto aqui, “Ctrl + U”, para ver o código-fonte dessa página, que o apóstrofe do “Grey's Anatomy”, como chamamos aspas simples, de “Grey's Anatomy”,
-foi escapado, ele foi convertido para uma entidade HTML, e o que acontece?
-blade faz por padrão, é que sempre que exibirmos qualquer conteúdo utilizando essa sintaxe {{}} que é o antigo echo.
-blade faz é, transformar qualquer caractere que possa ter algum significado ambíguo dentro do HTML ou até de JavaScript,
-ele transforma esses caracteres em uma entidade HTML para garantir que não tenhamos nenhum problema.
-
-## existe um ataque chamado de cross site scripting, ou pela sua sigla XSS, que basicamente é um ataque onde através de um input de usuário,
-uma entrada de dados do usuário, ele consegue atacar nosso site incluindo scripts que vão ser executados e através dessa limpeza que o blade faz, ele nos previne desse tipo de ataque,
-então temos um sistema mais seguro.
-
-##  existem casos onde eu preciso passar uma variável do PHP para o JavaScript por exemplo,
-então imagina que eu tenho aqui uma tag script <script></script>, e eu quero ter a minha variável séries aqui no JavaScript contendo o valor de séries que está lá no PHP.
-Eu posso utilizar uma função que o próprio Laravel nos traz através do const series = {{ Js::from($series) }}
-ele vai fazer pegar o valor do PHP vai fazer o json_encode, vai encapsular isso, vai envolver isso dentro de uma chamada do json parse e isso vai nos trazer o resultado esperado.
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+================================================================================================================================================================================
 ================================================================================================================================================================================
 mod 04
 
-# Vimos que gerenciar o front-end pode ser trabalhoso
-# Entendemos a dificuldade de se utilizar Webpack
-# Conhecemos o Laravel Mix
-# Utilizamos o Laravel Mix para instalar e configurar o bootstrap
+#
 
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-## Já vimos até agora o blade, que é uma baita ferramenta, mas o Laravel consegue nos ajudar além disso, não só gerando HTML através do blade, mas também ele nos ajuda com ferramentas
-específicas de front-end.
-ntão isso não é muito profissional vamos dizer assim em projetos onde temos várias dependências de front-end, porque se eu tenho só o Bootstrap, ok, mas imagina que eu tenho várias
-bibliotecas do front-end, sendo utilizadas e eu preciso acompanhar cada uma delas dessa forma, enfim, não é prático, então para isso tendemos a utilizar algum gerenciador de pacotes,
-um gerenciador de dependências do front-end.
+-----------------------------------------------------------------------------------------------------------------------------------
+##
 
-## Por exemplo, o NPM ou Yarn, então aqui por exemplo, para instalar o Bootstrap poderíamos utilizar o NPM.
-só que dessa forma precisamos conhecer alguns detalhes de front-end, para eu utilizar o Bootstrap eu não posso simplesmente, fazer o require de um arquivo CSS que ele tenha,
-porque dessa forma o que ele vai trazer para nós são os arquivos-fontes do Bootstrap, utilizando um pré-processador de CSS, que inclusive tem até treinamento disso aqui na Alura, é SASS ou SCSS.
-
-## Mas enfim, isso não vem ao caso, o ponto é, precisamos desses conhecimentos, e para não precisarmos nos preocupar tanto, principalmente quando temos várias dependências, existe uma outra
-ferramenta muito conhecida e utilizada no front-end, que é webpack.
- O que o webpack faz super simplificando?
- Ele tem um arquivo de configuração, onde você diz para ele o que você quer que o webpack faça com seus arquivos de front-end, qualquer coisa relacionada a front-end ele consegue fazer,
- ele consegue mover arquivos de um local para outro, ele consegue transformar um SCSS em CSS, ele consegue pegar imagens e mover para outro local, aplicar plugins até utilizar essas imagens,
- ele consegue fazer um monte de coisa.
- Só que precisaríamos ter nesse arquivo de configuração do nosso webpack, só para adicionar o Bootstrap, mas tende a ser bastante verboso vamos dizer assim, é uma tarefa não muito simples.
- Quando começamos a trabalhar com framework front-end, como React, Angular, eles já abstraem essa complexidade para nós, já trazem o webpack configurado, mais o Angular do que o React,
-por ser um framework, mas enfim, essa complexidade é um pouco escondida, mas quando trabalhamos com as dependências sendo gerenciadas por nós mesmos, acabamos precisando lidar com o webpack
-
-## então a terceira alternativa é o laravel mix
-
-## O que o Laravel Mix é?
-É basicamente um pacote JavaScript, ou seja, embora o Laravel seja um framework PHP, ele nos fornece um componente JavaScript, para facilitar na escrita de um arquivo de configuração do webpack,
-então por exemplo para eu aplicar e utilizar um plugin chamado, “post.css”, ao invés de ter a configuração na "mão",simplesmente tenho uma linha, eu aponto, eu digo onde está o conteúdo que eu quero
-fazer esse processamento, e para onde esse conteúdo vai, simples.
-
-## Então repara que utilizando o Laravel Mix, vamos muitas facilidades na hora de configurar o webpack.
-
-passo a passo
-1.0 -  Mix # npm install laravel-mix --save-dev
-1.1 - Depois crie na raiz do projeto o arquivo webpack.mix.js
-1.2 - com o seguinte conteúdo: const mix = require('laravel-mix');
-1.3 - npm run dev - copila o laravel mix
-2.0 - Bootstrap
-3.0 - configurar o webpack utilizando o Mix.
-
-obs: NPM  precisa está instalado, então é só acessar o site oficial do Node e baixar o Node, porque ele já vem com NPM,
-caso você prefira você pode utilizar uma imagem do docker por exemplo, isso não vem ao caso,
-------------------------------------------------------------------------|
-sudo snap install node --classic  nodejs                                |
-------------------------------------------------------------------------|
-
- E para instalar o Laravel Mix, o que você precisa fazer é rodar um npm install,
- então isso vai ler o arquivo, o “package.json”, que é como se fosse um “composer.json” só que do front-end,
- do Node, do NPM, então o que que ele vai fazer?
- Vai buscar os pacotes que precisa instalar, vai baixar na nossa máquina e deixar tudo pronto, e o que ele vai baixar é exatamente esse pacote Laravel Mix
-
- ## á temos o Laravel Mix instalado, vamos instalar o Bootstrap
- ## já vimos que existem várias formas, mas uma delas é através do gerenciador de dependência, seja NPM, ou Yarn
- ## ntão como eu estou utilizando aqui o NPM vou utilizar o comando que eu vou rodar mas não faz diferença nenhuma se você utilizar o Yarn por exemplo
- ## que o npm é utilizando atraves do uso do laravelmix
- ## npm install bootstrap, e isso vai simplesmente buscar lá no repositório de pacotes de NPM, e trazer o Bootstrap
- ## apos intalado ir a documentação sobre configurações utilizando webpack
- eu vou vir aqui em resources no meu “app.css” que é um arquivo que já existe e vem vazio, eu vou simplesmente, renomear ele para “app.scss”
- gora esse arquivo é um arquivo SASS e não um CSS comum, então eu posso fazer isso daqui, eu posso importar o Bootstrap, até ai é simples.
- Só o que eu preciso fazer agora? Eu preciso fazer toda configuração para que? Para fazer com que esse meu arquivo SCSS, meu arquivo SCSS, seja compilado para CSS e venha aqui para minha pasta public.
- Só que eu não vou precisar fazer isso daqui tudo, tudo que eu preciso fazer é editar esse arquivo aqui, “webpack.mix”
-
-mix
-.sass('resources/css/app.scss', 'public/css')
-.js('resources/js/app.js', 'public/js')
-
-
-obs: O que acontece? Eu tinha o Laravel Mix configurado já com “postCss”, agora eu estou chamando um método chamado SASS, e o SASS é uma outra dependência do webpack que eu precisaria instalar,
-o que ele vai fazer é baixar essa dependência para nós sem nem precisarmos saber qual é o plugin necessário.
-
-# npm run dev
-
-Então quando eu executo, npm run dev, o que ele vai fazer é executar o Laravel Mix, primeira vez que você rodar esse comando, ele vai baixar o plugin de SASS,
-agora na pasta que não existia antes nenhum conteudo dentro css, agora eu tenho aqui, o meu “app.css” com todo o arquivo do Bootstrap aqui. caminho: public/css/app.css
-Então para utilizar isso, que eu posso fazer? Posso ir lá no meu layout, adicionar aqui uma tag link, que vai adicionar o meu arquivo “css”, e eu poderia muito bem fazer isso daqui, /css/app.css,
-Só que em alguns casos podemos ter o nosso front-end, vindo de outro domínio.
-entao eu posso utilizar a função asset, então dentro dos meus assets, que por enquanto é a minha pasta “public”, eu vou buscar dentro de “css” um (‘css/app.css’).
-<link rel="stylesheet" href="{{ asset('css/app.css') }}">
-
-
-** resumo **
-
- O que fizemos aqui? Instalamos o Bootstrap utilizando o NPM, então agora o nosso “package.json”, além de tudo que já tinha, ele tem também o Bootstrap aqui, ou seja,
- repara que ele é a única dependência que realmente temos e eu poderia muito bem ter colocado ele como dependência de desenvolvimento também, porque estamos utilizando o SASS dele,
- mas em tempo de desenvolvimento compilamos ele para CSS.
-
- {
-    "private": true,
-    "scripts": {
-        "dev": "npm run development",
-        "development": "mix",
-        "watch": "mix watch",
-        "watch-poll": "mix watch -- --watch-options-poll=1000",
-        "hot": "mix watch --hot",
-        "prod": "npm run production",
-        "production": "mix --production"
-    },
-    "devDependencies": {
-        "axios": "^0.25",
-        "laravel-mix": "^6.0.49",
-        "lodash": "^4.17.19",
-        "postcss": "^8.1.14",
-        "resolve-url-loader": "^5.0.0",
-        "sass": "^1.54.4",
-        "sass-loader": "^12.6.0"
-    },
-    "dependencies": {
-        "bootstrap": "^5.2.0"
-    }
-}
-
-recomendado cuurso de -- webpack --
-
-Instalamos o Bootstrap, vimos na documentação como faz para utilizar o Bootstrap em uma configuração mais profissional vamos dizer assim, utilizando o webpack, para isso, o que precisamos?
-De um arquivo “sass” nosso, então criamos, só precisamos importar o Bootstrap @import "~bootstrap/scss/bootstrap";
-Agora a parte complexa é configurar o webpack, precisamos de plugin, um arquivo de configuração grande e difícil de entender, e nesse ponto o Laravel Mix brilha, olha só o que precisamos fazer?
-Uma linha, com isso estamos pegando um arquivo “sass” e convertendo, compilando ele para um CSS nessa pasta aqui sass('resources/css/app.scss', 'public/css'), bem simples na cofiguração.
-
-## resusmo ##
-
-Então um resumo super rápido, webpack é uma ferramenta que permite que tenhamos um pipeline, uma linha de execução que queiramos fazer no nosso front-end, então vamos pegar um arquivo e mover
-para outro lugar, vai transpilar um typescript para JavaScript, vai transpilar um SCSS para CSS, então essa pipeline de operações existe e utilizamos o webpack para configurar.
-E o Laravel Mix é uma ferramenta que super simplifica a configuração do webpack, aquela configuração grande que o Bootstrap nos sugeriu virou isso daqui no Mix, então a ideia desse capítulo é
-apresentar o Mix, mas claro que, para entender o valor do Mix você precisa entender as dificuldades do webpack, então de novo, eu sugiro bastante dar uma olhada no treinamento de webpack
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ================================================================================================================================================================================
+================================================================================================================================================================================
 mod 05
 
-# Conhecemos o conceito de “model” no Laravel
-# Aprendemos sobre Migrations do banco de dados
-# Vimos como executar queries através da Facade DB
-# Conhecemos o Eloquent ORM
+#
+
+-----------------------------------------------------------------------------------------------------------------------------------
+##
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-## ao trablahar na camada do model, é necessário alterar as configurações do Laravel. Dentro da pasta "config”, temos vários arquivos de configuração.
-por exemplo de log, de envio de e-mail, de filas, e o arquivo genérico, de “app.php”, ou seja, da aplicação como toda, então aqui podemos ver coisas mais genéricas da aplicação,
-como o nome da aplicação, o ambiente no qual ela está rodando, se é produção, se é desenvolvimento, se é ambiente local, se o debug vai estar habilitado, etc.
-##  vamos olhar o arquivo de configuração de banco de dados - database.php, repara que a primeira coisa é qual é o tipo de conexão que vamos utilizar, pode ser uma MySQL, pode ser uma SQLServer,
-pode ser PostgreSQL, ou SQLite - 'default' => env('DB_CONNECTION', 'mysql'),
-entao para cada tipo de configuração de banco setado  'default' => env, será apontado nas configurações abaixo do arquivo database.php.
 
-## então pensando no SQLite, eu preciso passar algumas informações, eu preciso passar qual é o banco de dados, onde esse banco de dados vai estar, e por padrão ele está
-dentro de database_path com o nome database.sqlite e esse database_path fica onde? Aqui dentro de database, então se aqui dentro eu criar um arquivo database.sqlite minha configuração está pronta,
-não preciso fazer mais nada.
-
-##  E repara que eu poderia passar a senha, mas pensa, esse meu código de configuração ele é versionado, eu utilizo git por exemplo e envio isso para um servidor, por exemplo o GitHub, e imagine que
-isso vaza, e mesmo que não vaze, eu estou dando acesso as minhas senhas ao pessoal do GitHub, isso não é nada interessante
-**  nunca coloque credenciais, seja token, uma chave de acesso, ou senhas, dentro de código, jamais, seu código não é o local para você colocar credenciais **
-para isso vai ficar em variáveis de ambiente do seu sistema. é basicamente um valor que fica no seu sistema operacional e que as aplicações conseguem ler, então basicamente todo computador que
-você utiliza tem variáveis de ambiente.
-## Então quando você subir esse seu código em Laravel para uma AWS da vida, você tem um local para configurar variáveis de ambiente, quando você sobe para o Heroku você tem um outro local para
-configurar as variáveis de ambiente, se você está subindo em uma VPS, em um servidor que você configura, você pode definir as variáveis de ambiente
-## e no ambiente de desenvolvimento, Laravel traz aqui um “arquivo.env”, que  ele te permite criar aqui várias variáveis de ambiente e na hora que o framework vai subir, ele pega todas essas variáveis
-e lê como se fossem variáveis de ambiente.
-
-# repare que essas variáveis de ambiente estão sendo lidas através de env, essa função env lê uma variável de ambiente e retorna seu valor, simples. 'url' => env('DATABASE_URL'),
-Por isso eu posso vir aqui em DB_CONNECTION dentro do arquvi env, e mudar para SQLite, pronto, agora eu tenho o meu SQLite configurado.
-Então aqui por exemplo, DB_CONNECTION, ele está lendo a variável de ambiente chamada DB_CONNECTION, e o valor dela foi definido por mim como SQLite,
-se eu não tivesse definido ele utilizaria esse valor padrão aqui, que é uma MySQL, então aqui nesse caso como eu não estou definindo  'url' => env('DATABASE_URL'), o DB_DATABASE, ele vai utilizar esse valor padrão,
-que é o nosso database.sqlite.
-
-## Basicamente seeders são criadores de dados que podemos utilizar para já inserir o banco de dados quando uma aplicação for inicializada por exemplo, então imagina que você está trabalhando em um projeto
-e entrou uma nova pessoa na equipe e você quer que essa pessoa na equipe tenha no seu ambiente local alguns dados já inseridos no banco de dados, você pode ter isso no seeders, por exemplo, um usuário padrão com permissões de administrador e etc.
-
-## á factories são formas de você criar esses dados falsos, então por exemplo, se eu quero criar vários usuários, eu posso utilizar uma factory e lá eu consigo criar um nome de mentira, uma idade falsa, e eu consigo criar 100 usuários com uma linha
-de código só.
-
-## o que migrations?
-Migration é basicamente um versionamento do banco de dados, então você tem criação de uma tabela, de várias tabelas na verdade, e você pode desfazer uma migration, ou seja, uma migration, é um ponto de alteração no seu banco de dados, e toda migration
-pode ser desfeita e refeita de forma muito simples.
-## na criação de tabela por uso de migrations # php artisan make:migration create_series_table
-
-## a migration criada, então como que eu posso fazer para executar?
-# php artisan migrate
-
-##  Se você quiser mais detalhes sobre migrations na documentação laravel sobre database migrations, e da mesma forma que podemos rodar as migrations podemos reverter,
-então basta fazer um # php artisan migrate:rollback, isso vai desfazer a última migration, posso desfazer várias migrations e etc.
-
-## nos formularios do blade precisamos enviar de volta essa informação para que lá no nosso back-end, saibamos que esta informação realmente foi enviada por esse formulário e não de algum outro lugar, então
-embora a solução pareça complexa, para corrigirmos basta no nosso formulário adicionar @csrf, essa diretiva do blade, ele já cuida de todos os detalhes para nós.
-
-# diferença entre ORM DOCTRINE E O ORM ELOQUENT, possuem a mesma ideia na falicidade de manipulação dos dados junto ao banco de dados, com inserir, deletar, buscar.
-O Laravel também fornece um ORM, um Object relational mapping, um mapeamento do mundo orientado a objetos, para o mundo relacional,
-só que o eloquent segue um padrão bem diferente do Doctrine, lá no Doctrine temos uma entidade, é uma classe do nosso negócio, que não conhece qual é a tabela, quais são as colunas e etc
-E a outra classe que é a entity manager, que faz com que essa tabela seja inserida no meu banco de dados, e se eu quero buscar alguma coisa eu uso um repositório,
-eloquent que é o nome do ORM do Laravel, então utilizando o eloquent, usamos um outro padrão onde a mesma classe vai fazer isso tudo, ela representa uma série, ela insere uma nova série no banco de dados e ela
-busca em séries no banco, ela faz isso tudo, ou seja, ganhamos uma baita simplicidade,
-
-##  linha de comando com PHP artisan make model e o nome dessa model vai ser “serie”, simples assim.
-porém se atentar detalhes, Ele vai criar uma nova classe que é um model do eloquent ORM. exemplo # php artisan make:model Serie. será criado uma classe do tipo model Series
-com s no final.
-
-## repara que essa classe está vazia, ela só tem uma trait de HasFactory, para indicar que tem uma factory lá para podermos criar dados com ela, nem vamos utilizar isso por enquanto.
-
-## Essa model meio que é mapeada para uma tabela do banco, então se eu tenho uma classe chamada série, o eloquent ORM vai buscar uma tabela no banco de dados chamada “series”, que é exatamente o nome da tabela que temos lá,
-mas se o nome da tabela fosse “seriados” por exemplo, eu poderia ter aqui o atributo table definido como seriados, então eu consigo configurar isso, mas o padrão já vai nos atender.
-
-protected $table = "seriados";
-
-
-## E como essa classe está estendendo model, temos vários métodos que podemos utilizar, então vamos lá, no nosso controller utilizar alguns desses métodos, primeiro vamos buscar os dados utilizando essa model, então eu vou utilizar
-essa série, e eu posso fazer queries complexas e etc., mas por
-
-
-
-***********
-obs
-***********
- public function index()
-    {
-        // $series = [
-        //     'Punisher',
-        //     'Lost',
-        //     'Grey\'s Anatomy'
-        // ];
-
-        /** nao usar */
-        // $series = DB::select('SELECT nome FROM series');
-
-    /** forma correta uso orm eloquent*/
-        $series = Serie::all();
-
-        return view('series.index')->with('series', $series);
-    }
-**********
-
-
-***********
-obs
-***********
-
-/** nao usar */
-$nomeSerie = $request->input('nome');
-        if (DB::insert('INSERT INTO series (nome) VALUES (?)', [$nomeSerie])) {
-           return redirect('series');
-        } else {
-            return "erro";
-        }
-
-
-/** forma correta uso orm eloquent*/
-        $nomeSerie = $request->input('nome');
-        if ($nomeSerie != null) {
-            $serie = new Serie();
-            $serie->nome = $nomeSerie;
-            $serie->save();
-            return redirect('series')->with('success', 'Cadastro realizado com sucesso!');
-
-        } else {
-            return redirect('series')->with('danger', 'Cadastro não realizado! Por gentileza preencha o campo corretamente!');
-        }
-    }
-**********
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+================================================================================================================================================================================
