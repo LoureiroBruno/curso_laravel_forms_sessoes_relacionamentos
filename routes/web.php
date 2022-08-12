@@ -22,7 +22,7 @@ Route::get('/', function () {
  * Grupo SerieController
  */
 Route::controller(controller: SeriesController::class)->group(function () {
-    Route::get('/series','index')->name('indexSeries');
-    Route::get('/series/criar','create')->name('createSeries');
-    Route::post('/series/salvar','store')->name('storeSeries');
+    Route::get('/series','index')->name('series.index');
+    Route::get('/series/create','create')->name('series.create');
+    Route::post('/series/store','store')->name('series.store');
 });

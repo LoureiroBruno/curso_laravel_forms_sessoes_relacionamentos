@@ -16,7 +16,7 @@
                 </div>
             @endif
 
-            <a href="{{ route('createSeries') }}" class="btn btn-primary btn-sm mb-4" tabindex="-1" role="button"
+            <a href="{{ route('series.create') }}" class="btn btn-primary btn-sm mb-4" tabindex="-1" role="button"
                 aria-disabled="true">Adicionar</a>
             <ul class="list-group">
                 @foreach ($series as $serie)

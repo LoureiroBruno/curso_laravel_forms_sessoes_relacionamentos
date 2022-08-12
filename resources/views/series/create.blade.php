@@ -6,7 +6,7 @@
             Nova Série
             </x-slot>
 
-            <form action="{{ route('storeSeries') }}" method="POST">
+            <form action="{{ route('series.store') }}" method="POST">
                 @csrf
                 <div class="mb-3">
                     <label for="nome" class="form-label">Nome</label>
@@ -14,7 +14,7 @@
                 </div>
                 <div class="col-auto">
                     <button type="submit" class="btn btn-primary btn-sm mb-3">Salvar</button>
-                    <a href="{{ route('indexSeries') }}" class="btn btn-danger btn-sm mb-3" tabindex="-1" role="button"
+                    <a href="{{ route('series.index') }}" class="btn btn-danger btn-sm mb-3" tabindex="-1" role="button"
                     aria-disabled="true">Cancelar</a>
                 </div>
 
