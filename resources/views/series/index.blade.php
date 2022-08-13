@@ -24,8 +24,8 @@
                     <tr class="th-tabela-series">
                         <th scope="col">#</th>
                         <th scope="col">Descrição</th>
-                        <th scope="col">Inscrito</th>
-                        <th scope="col">Atualizado</th>
+                        <th scope="col">Data de Inscrição</th>
+                        <th scope="col">Data de Edição</th>
                         <th scope="col">Ações</th>
                     </tr>
                 </thead>
@@ -38,10 +38,10 @@
                             <td>{{ $serie->updated_at }}</td>
                             <td class="td-coluna-acoes-tabela-series">
                                 <div>
-                                    <form action="{{ route('series.show', $serie->id) }}" method="get" id="btn-update">
+                                    <form action="{{ route('series.edit', $serie->id) }}" method="get" id="btn-update">
                                         @csrf
                                         @method('EDIT')
-                                        <button type="submit" class="btn btn-outline-dark btn-sm mb-1">
+                                        <button type="submit" class="btn btn-outline-dark btn-sm mb-1 ms-1">
                                             Editar
                                         </button>
                                     </form>

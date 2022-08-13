@@ -21,5 +21,5 @@ Route::get('/', function () {
 /**
  * Grupo SerieController Recurso Route::Resource
  */
-Route::resource('/series', SeriesController::class)->only(['index','create','store','destroy','show','edit','update']);
+Route::resource('/series', SeriesController::class)->except(['show']);
 

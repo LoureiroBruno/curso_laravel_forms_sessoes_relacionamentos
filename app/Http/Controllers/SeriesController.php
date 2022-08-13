@@ -62,10 +62,10 @@ class SeriesController extends Controller
     }
 
 
-    public function show(Serie $series)
+    public function edit(Serie $series)
     {
         $series = $series->find($series->id);
-        return view('series.show')->with(
+        return view('series.edit')->with(
             ['series'=> $series]
         );
     }

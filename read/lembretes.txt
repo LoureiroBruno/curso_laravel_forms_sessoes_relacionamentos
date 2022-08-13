@@ -352,6 +352,135 @@ public function destroy(Serie $series, Request $request)
             return to_route('series.index');
         }
     }
+
+
+---------------------------------
+ 09
+---------------------------------
+
+## na edição de um registro passado por paramentro ao acinar o botão editar.
+<form action="{{ route('series.edit', $serie->id) }}" method="get" id="btn-update">
+    @csrf
+    @method('EDIT')
+    <button type="submit" class="btn btn-outline-dark btn-sm mb-1 ms-1">
+        Editar
+    </button>
+</form>
+
+criado um formulario com submit de id no verbo post, e sendo recebido no controlador edit, mas antes de ter passado pelo rota: series/series/edit
+series dominio, segundo series éo parametro objeto, edit é o restante do nome da rota.
+
+public function edit(Serie $series)
+    {
+        $series = $series->find($series->id);
+        return view('series.edit')->with(
+            ['series'=> $series]
+        );
+    }
+
+e recebido na rota edit capturando o id passado por paramentro do obje series->id, e retornano a view com o objeto da linha selecionada de id.
+
+recebida na view edit
+<x-layout>
+    <x-slot:title>
+        Series - Alterar Item
+        </x-slot>
+        <x-slot:header>
+            Editar Série: {{ $series->nome }}
+            </x-slot>
+
+            <x-series.form action="{{ route('series.update', $series->id) }}" nome="{{ $series->nome }}" />
+
+            {{-- <form action="{{ route('series.update', $series->id) }}" method="post">
+                @csrf
+                @method('PATCH')
+                <div class="mb-3">
+                    <label for="nome" class="form-label">Nome</label>
+                    <input type="nome" class="form-control" id="nome" name="nome" value="{{ $series->nome }}" placeholder="Nome do Título da Série">
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary btn-sm mb-3">Salvar</button>
+                    <a href="{{ route('series.index') }}" class="btn btn-danger btn-sm mb-3" tabindex="-1" role="button"
+                    aria-disabled="true">Cancelar</a>
+                </div>
+            </form> --}}
+</x-layout>
+
+que enseguinda é enviado ao metodo de update para efetuar a alteração
+usado o componte da blade para o naõ execesso de repetição de código.
+
+view edit
+
+<x-layout>
+    <x-slot:title>
+        Series - Alterar Item
+        </x-slot>
+        <x-slot:header>
+            Editar Série: {{ $series->nome }}
+            </x-slot>
+
+            <x-series.form action="{{ route('series.update', $series->id) }}" nome="{{ $series->nome }}" />
+
+            {{-- <form action="{{ route('series.update', $series->id) }}" method="post">
+                @csrf
+                @method('PATCH')
+                <div class="mb-3">
+                    <label for="nome" class="form-label">Nome</label>
+                    <input type="nome" class="form-control" id="nome" name="nome" value="{{ $series->nome }}" placeholder="Nome do Título da Série">
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary btn-sm mb-3">Salvar</button>
+                    <a href="{{ route('series.index') }}" class="btn btn-danger btn-sm mb-3" tabindex="-1" role="button"
+                    aria-disabled="true">Cancelar</a>
+                </div>
+            </form> --}}
+</x-layout>
+
+view create
+
+<x-layout>
+    <x-slot:title>
+        Series - Cadastrar Item
+        </x-slot>
+        <x-slot:header>
+            Nova Série
+            </x-slot>
+
+            <x-series.form action="{{ route('series.store') }}" />
+            {{-- <form action="{{ route('series.store') }}" method="POST">
+                @csrf
+                <div class="mb-3">
+                    <label for="nome" class="form-label">Nome</label>
+                    <input type="nome" class="form-control" id="nome" name="nome" placeholder="Nome do Título da Série">
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-outline-primary btn-sm mb-3">Salvar</button>
+                    <a href="{{ route('series.index') }}" class="btn btn-outline-danger btn-sm mb-3 ms-2" tabindex="-1" role="button"
+                    aria-disabled="true">Cancelar</a>
+                </div>
+            </form> --}}
+</x-layout>
+
+herdado da view componetizado de form
+
+<form action={{ $action }} method="POST">
+    @csrf
+    @isset($nome)
+        @method('PUT')
+    @endisset
+
+    <div class="mb-3">
+        <label for="nome" class="form-label">Nome</label>
+        <input type="text" class="form-control" id="nome" name="nome" placeholder="Nome de Descrição Série"
+            @isset($nome) value="{{ $nome }}" @endisset>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-outline-primary btn-sm mb-3">Salvar</button>
+        <a href="{{ route('series.index') }}" class="btn btn-outline-danger btn-sm mb-3 ms-2" tabindex="-1"
+            role="button" aria-disabled="true">Cancelar</a>
+    </div>
+</form>
+
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ================================================================================================================================================================================
