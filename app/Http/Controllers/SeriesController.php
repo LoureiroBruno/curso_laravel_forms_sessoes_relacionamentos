@@ -39,48 +39,57 @@ class SeriesController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->input('nome') != null) {
-            $serie = Serie::create($request->all());
-
-            return to_route('series.index')->with("success", "Cadastrado a série: '{$serie->nome}' com sucesso!");
-        } else {
-
+        if ($request->input('nome') == null) {
             return redirect('series')->with("danger", "Há dados não informados, tente novamente!");
         }
+
+        $serie = Serie::create($request->all());
+
+        return to_route('series.index')->with("success", "Cadastrado a série: '{$serie->nome}' com sucesso!");
+
     }
 
     public function destroy(Serie $series)
     {
-        if ($series != null) {
-            $series->delete();
-
-            return to_route('series.index')->with("success", "Excluído o Registro #{$series->id} | nome: '{$series->nome}' com Sucesso!");
-        } else {
-
-            return to_route('series.index')->with("danger", "Nenhuma identificação no registro foi encontrado!");
+        if ($series == null) {
+            return to_route('series.index')->with("danger", "Não foi possível realizar exlusão de cadastro");
         }
+
+        $series->delete();
+
+        return to_route('series.index')->with("success", "Excluído o Registro #{$series->id} | nome: '{$series->nome}' com Sucesso!");
+
     }
 
 
     public function edit(Serie $series)
     {
-        $series = $series->find($series->id);
+        // $series = $series->find($series->id);
         return view('series.edit')->with(
-            ['series'=> $series]
-        );
+                                            ['series'=> $series]
+                                        );
     }
 
 
     public function update(Request $request, Serie $series)
     {
-        if ($series != null) {
-            $series->where('id', $series->id)->update(['nome' => $request->nome]);
+        // if ($series != null) {
+        //     $series->where('id', $series->id)->update(['nome' => $request->nome]);
 
-            return to_route('series.index')->with("success", "Atualizado a série: '{$request->nome}' com sucesso!");
-        } else {
+        //     return to_route('series.index')->with("success", "Atualizado a série: '{$request->nome}' com sucesso!");
+        // } else {
 
-            return redirect('series')->with("danger", "Há dados não informados, tente novamente!");
+        //     return redirect('series')->with("danger", "Há dados não informados, tente novamente!");
+        // }
+
+        /** mais simples */
+        if ($request->nome == null) {
+            return to_route('series.index')->with("danger", "Não foi possível realizar atualização de cadastro");
         }
+
+        $series->fill($request->all());
+        $series->save();
+        return to_route('series.index')->with("success", "Atualizado a série: '{$series->nome}' com sucesso!");
     }
 
 
