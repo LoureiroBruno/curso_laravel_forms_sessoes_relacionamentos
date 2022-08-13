@@ -16,12 +16,6 @@
                 </div>
             @endif
 
-            @isset($mensagemDestroy)
-                <div class="alert alert-info">
-                    {{ $mensagemDestroy }}
-                </div>
-            @endisset
-
             <a href="{{ route('series.create') }}" class="btn btn-primary btn-sm mb-4" tabindex="-1" role="button"
                 aria-disabled="true">Adicionar</a>
 
@@ -44,16 +38,15 @@
                             <td>{{ $serie->updated_at }}</td>
                             <td class="td-coluna-acoes-tabela-series">
                                 <div>
-                                    <form action="" method="post" id="btn-update">
+                                    <form action="{{ route('series.show', $serie->id) }}" method="get" id="btn-update">
                                         @csrf
-                                        {{-- @method('EDIT') --}}
+                                        @method('EDIT')
                                         <button type="submit" class="btn btn-outline-dark btn-sm mb-1">
                                             Editar
                                         </button>
                                     </form>
 
-                                    <form action="{{ route('series.destroy', $serie->id) }}" method="post"
-                                        id="btn-destroy">
+                                    <form action="{{ route('series.destroy', $serie->id) }}" method="post" id="btn-destroy">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-outline-danger btn-sm mb-1">

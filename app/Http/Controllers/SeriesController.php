@@ -17,11 +17,7 @@ class SeriesController extends Controller
         // $series = Serie::all();
         $series = Serie::orderBy('nome', 'asc')->get();
 
-         /** recebido  do metodo destroy*/
-        $mensagemDestroy = $request->session()->get('mensagem.destroy');
-        $request->session()->forget('mensagem.destroy');
-
-        return view('series.index')->with('series', $series)->with('mensagemDestroy', $mensagemDestroy);
+        return view('series.index')->with('series', $series);
 
     }
 
@@ -43,32 +39,49 @@ class SeriesController extends Controller
      */
     public function store(Request $request)
     {
-        $nomeSerie = $request->input('nome');
-        if ($nomeSerie != null) {
-            Serie::create($request->all());
+        if ($request->input('nome') != null) {
+            $serie = Serie::create($request->all());
 
-            return to_route('series.index')->with("success", "Cadastrado a série ({$nomeSerie}) com sucesso!");
+            return to_route('series.index')->with("success", "Cadastrado a série: '{$serie->nome}' com sucesso!");
         } else {
 
             return redirect('series')->with("danger", "Há dados não informados, tente novamente!");
         }
     }
 
-    public function destroy(Request $request)
+    public function destroy(Serie $series)
     {
-        $idSerie = $request->series;
-        if ($request->series != null) {
-            Serie::destroy($request->series);
-            $request->session()->put('mensagem.destroy', "Excluído o Registro de n° {$idSerie} com Sucesso!");
+        if ($series != null) {
+            $series->delete();
 
-            /** enviado para a rota index que invia a view index */
-            return to_route('series.index');
+            return to_route('series.index')->with("success", "Excluído o Registro #{$series->id} | nome: '{$series->nome}' com Sucesso!");
         } else {
-            /** caso use session->flash desnecessário uso session()->forget() */
-            $request->session()->put('mensagem.destroy', "Nenhuma identificação no registro foi encontrado!");
 
-            return to_route('series.index');
+            return to_route('series.index')->with("danger", "Nenhuma identificação no registro foi encontrado!");
         }
     }
+
+
+    public function show(Serie $series)
+    {
+        $series = $series->find($series->id);
+        return view('series.show')->with(
+            ['series'=> $series]
+        );
+    }
+
+
+    public function update(Request $request, Serie $series)
+    {
+        if ($series != null) {
+            $series->where('id', $series->id)->update(['nome' => $request->nome]);
+
+            return to_route('series.index')->with("success", "Atualizado a série: '{$request->nome}' com sucesso!");
+        } else {
+
+            return redirect('series')->with("danger", "Há dados não informados, tente novamente!");
+        }
+    }
+
 
 }

@@ -211,6 +211,147 @@ E o singular de “séries” em inglês é “series”. Então, por isso ele e
 Eu peguei todos os parâmetros das minhas rotas.
 
 por isso que no contorle obtem $request->serie;
+
+
+---------------------------------
+ 06
+---------------------------------
+
+Então, quando eu utilizo o helper de session, ele não faz aquele flash. Então, para ter um flash, eu vou utilizar o meu request mesmo.
+Então $request->session()->flash(‘mensagem.sucesso’, ‘Série adicionada com sucesso’), essa sintaxe sendo utilizada.
+
+e mais interessante usar
+
+controlador
+    public function destroy(Serie $series)
+    {
+        if ($series != null) {
+            $series->delete();
+
+            return to_route('series.index')->with("sucess", "Excluído o Registro de n° {$series->id} com Sucesso!");
+        } else {
+
+            return to_route('series.index')->with("danger", "Nenhuma identificação no registro foi encontrado!");
+        }
+    }
+
+view
+
+         @if (session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+            @elseif (session('danger'))
+                <div class="alert alert-danger">
+                    {{ session('danger') }}
+                </div>
+            @endif
+
+
+do que este
+
+controlador
+  public function destroy(Request $request)
+    {
+        $idSerie = $request->series;
+        if ($request->series != null) {
+            Serie::destroy($request->series);
+            $request->session()->put('mensagem.destroy', "Excluído o Registro de n° {$idSerie} com Sucesso!");
+
+            /** enviado para a rota index que invia a view index */
+            return to_route('series.index');
+        } else {
+            /** caso use session->flash desnecessário uso session()->forget() */
+            $request->session()->put('mensagem.destroy', "Nenhuma identificação no registro foi encontrado!");
+
+            return to_route('series.index');
+        }
+    }
+view
+            @isset($mensagemDestroy)
+                <div class="alert alert-info">
+                    {{ $mensagemDestroy }}
+                </div>
+            @endisset
+
+
+---------------------------------
+ 07
+---------------------------------
+## Ao criar uma série, preciso pegar o nome essa série que foi criada para adicionar na mensagem. E esse método ::create, ou seja, o método estático create, já nos retorna a model que foi criada,
+no caso uma série nossa.
+Então, se eu já tenho a série em mãos, basta adicionar o nome dela na nossa mensagem. Então eu vou trocar para aspas duplas, para poder ter variáveis dentro, e eu vou informar que a {$serie-nome} foi adicionada.
+Então, se eu adicionar uma série chamada “Teste”, ele vai dizer “Série Teste adicionada com sucesso”.
+
+
+public function store(Request $request)
+{
+    if ($request->input('nome') != null) {
+        $serie = Serie::create($request->all());
+
+        return to_route('series.index')->with("success", "Cadastrado a série ({$serie->nome}) com sucesso!");
+    } else {
+
+        return redirect('series')->with("danger", "Há dados não informados, tente novamente!");
+    }
+}
+
+Só que na hora de remover essa série, vamos de novo no código. Só que esse método destroy não vai devolver para nós qual foi a série removida.
+Repara que o PHP Storm já me informa que o retorno dele é um inteiro de quantas séries foram removidas. não é isso que eu quero. Por que ela me devolve só isso?
+Porque na prática, o que ele está fazendo por debaixo dos panos é como se fosse executar essa query DELETE FROM serie WHERE id = $request->series.
+
+Serie::destroy($request->series); // DELETE FROM serie WHERE id = $request->series
+
+Alternativa 01
+
+public function destroy(Request $request)
+{
+    $idSerie = $request->series;
+    if ($request->series != null) {
+        Serie::destroy($request->series);
+        $request->session()->put('mensagem.destroy', "Excluído o Registro de n° {$idSerie} com Sucesso!");
+
+        /** enviado para a rota index que invia a view index */
+        return to_route('series.index');
+    } else {
+        /** caso use session->flash desnecessário uso session()->forget() */
+        $request->session()->put('mensagem.destroy', "Nenhuma identificação no registro foi encontrado!");
+
+        return to_route('series.index');
+    }
+}
+
+Então, eu consigo fazer isso de algumas formas. Primeiro, vou recuperar a série através de $serie = Serie::find($request->series);. O que esse método faz?
+Ele encontra uma série baseada no seu ID, então vou passar o ID dessa série.
+Então vamos fazer só um “dd”, para ver se eu vou ter acesso a essa série. Então dd($serie). Vamos lá, na hora que remover uma série, por exemplo “Teste”,
+consegui encontrar e eu tenho minha série “Teste”.
+Essa é uma forma. Só que tem uma outra forma um pouco mais interessante. O Laravel consegue nos ajudar em alguns cenários quando tenho parâmetros na rota.
+Então, lembra que esse destroy a rota é /series/destroy/{series}?. Então, consigo ter um parâmetro chamado series, e ele nos traz alguma informação.
+Qual informação? Depende do tipo que eu definir esse parâmetro. Vou te explicar o que isso quer dizer.
+u vou ter um parâmetro chamado series e o tipo dele vai ser inteiro, por exemplo. Com isso, eu vou ter acesso ao ID da minha série. Então isso já deixa um pouco mais interessante o código.
+Então vamos atualizar e garantir que tudo continua funcionando.
+Então, repara que eu consegui buscar a série sem nem precisar adicionar código no meu controller, só de informar o parâmetro que eu estou utilizando public function destroy (Serie $series),
+isso é bastante interessante.
+Mas vamos lá, continuando, vou remover esse “dd”, e agora eu não preciso mais chamar esse método estático destroy, passando, por exemplo, dessa minha series o ID. Eu posso fazer isso sem problema nenhum,
+mas posso também, direto da minha instância, chamar o método delete, então $series->delete()
+
+
+ALternativa 02
+
+public function destroy(Serie $series, Request $request)
+    {
+        if ($request->series != null) {
+            $series->delete();
+            $request->session()->put('mensagem.destroy', "Excluído o Registro de n° {$series->id} com Sucesso!");
+
+            return to_route('series.index');
+        } else {
+
+            $request->session()->put('mensagem.destroy', "Nenhuma identificação no registro foi encontrado!");
+
+            return to_route('series.index');
+        }
+    }
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ================================================================================================================================================================================
