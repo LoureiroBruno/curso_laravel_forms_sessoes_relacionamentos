@@ -20,6 +20,13 @@
                 </div>
             @endif
 
+            {{-- @if(session('success') || session('warning') || session('danger'))
+                <div class="alert alert-{{ session('success') }} {{ session('warning') }} {{ session('danger') }}">
+                    {{ session('success') }} {{ session('warning') }} {{ session('danger') }}
+                </div>
+            @endif --}}
+
+
             <a href="{{ route('series.create') }}" class="btn btn-primary mb-4" tabindex="-1" role="button"
                 aria-disabled="true">Adicionar</a>
 
@@ -51,9 +58,9 @@
                                         </button>
                                     </form>
 
-                                    <form  action="{{ route('series.show', $serie->id) }}" method="post" id="btn-update">
+                                    <form  action="" method="post" id="btn-update">
                                         @csrf
-                                        @method('EDIT')
+                                        {{-- @method('EDIT') --}}
                                         <button type="submit" class="btn btn-outline-dark btn-sm mb-1">
                                             Editar
                                         </button>

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Serie;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class SeriesController extends Controller
 {
@@ -41,22 +40,21 @@ class SeriesController extends Controller
         $nomeSerie = $request->input('nome');
         if ($nomeSerie != null) {
             Serie::create($request->all());
-            /** função pertecente ao Laravel 9.0 em diante */
             return to_route('series.index')->with('success', 'Cadastro Realizado com Sucesso!');
-
         } else {
-            return redirect('series')->with('warning', 'AVISO! Preencher título da série campo nome');
+            return redirect('series')->with('warning', 'Preencher título da série campo nome');
         }
     }
 
     public function destroy(Request $request)
     {
-        $idSerie = $request->serie;
-        if ($request->serie != null) {
-            Serie::destroy($request->serie);
+        $idSerie = $request->series;
+        if ($request->series != null) {
+            Serie::destroy($request->series);
             return to_route('series.index')->with('success', "Excluído o Registro de n° {$idSerie} com Sucesso! ");
         } else {
             return to_route('series.index')->with('danger', "Nenhum registro foi encontrado!");
         }
     }
+
 }
