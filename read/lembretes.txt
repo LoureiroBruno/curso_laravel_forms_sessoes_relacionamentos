@@ -1,7 +1,9 @@
 ================================================================================================================================================================================
 mod 01
 
-#
+# Aprendemos a usar o método create das models do Eloquent
+# Vimos para que serve o atributo fillable
+# Aprendemos a agrupar nossas rotas
 
 -----------------------------------------------------------------------------------------------------------------------------------
 
@@ -155,8 +157,60 @@ mod 02
 #
 
 -----------------------------------------------------------------------------------------------------------------------------------
-##
 
+---------------------------------
+ 02
+---------------------------------
+
+## Com essa forma de criar a rota em "create.blade.php" em Route::resource(name:'/series',controller:SeriesController::class);, já estou criando rotas que eu não tenho implementadas.
+Por exemplo, a de deletar, de atualizar uma série, de exibir detalhes de uma série. Então, o que eu quero é informar que estou definindo um controller de resource, mas apenas para
+algumas rotas. Então, como eu fiz com o meu request, eu posso utilizar os métodos except ou only.
+
+Route::resource(name:'/series',controller:SeriesController::class)
+->only([‘index’, ‘create’, ‘store’]);
+
+ao acrescentar um nova rota do tipo delete, no caso um post para deletar um intem do banco, ja que o html so reconhe apenas os verbos post e get.
+ficaria:
+Route::post('series/destroy/{serie}', [SeriesController::class, 'destroy'])->name('series.destroy');
+
+<form action="{{ route('series.destroy', $serie->id) }}" method="post" id="btn-destroy">
+    @csrf
+    <button type="submit" class="btn btn-outline-danger btn-sm mb-1">
+        Excluir
+    </button>
+</form>
+
+
+da mesma forma funcionaria inserindo no blade @method('DELETE)
+
+Route::delete('series/destroy/{serie}', [SeriesController::class, 'destroy'])->name('series.destroy');
+
+<form action="{{ route('series.destroy', $serie->id) }}" method="post" id="btn-destroy">
+    @csrf
+    @method('DELETE')
+    <button type="submit" class="btn btn-outline-danger btn-sm mb-1">
+        Excluir
+    </button>
+</form>
+
+desta forma de enviar o @method('DELETE');
+pode continuar usando o recurso do resource
+
+Route::resource('/series', SeriesController::class)->only([
+    'index',
+    'create',
+    'store',
+    'destroy',
+    'update'
+]);
+
+
+## a logica de funcionamento route::delete,
+O que ele faz para criar essa rota é a barra e o que definimos, que no caso é “series”, e depois da barra e o que definimos no singular agora.
+E o singular de “séries” em inglês é “series”. Então, por isso ele está passando esse parâmetro com o nome “series”. E como eu identifiquei que isso era o que estava acontecendo?
+Eu peguei todos os parâmetros das minhas rotas.
+
+por isso que no contorle obtem $request->serie;
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ================================================================================================================================================================================

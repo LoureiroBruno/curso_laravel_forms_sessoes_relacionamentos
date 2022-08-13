@@ -48,4 +48,15 @@ class SeriesController extends Controller
             return redirect('series')->with('warning', 'AVISO! Preencher título da série campo nome');
         }
     }
+
+    public function destroy(Request $request)
+    {
+        $idSerie = $request->serie;
+        if ($request->serie != null) {
+            Serie::destroy($request->serie);
+            return to_route('series.index')->with('success', "Excluído o Registro de n° {$idSerie} com Sucesso! ");
+        } else {
+            return to_route('series.index')->with('danger', "Nenhum registro foi encontrado!");
+        }
+    }
 }

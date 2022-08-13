@@ -2,7 +2,7 @@ h1 {
     background: currentColor;
     padding-bottom: 20px;
     padding-top: 10px;
-    margin-bottom: 30px;
+    margin-bottom: 100px;
 }
 
 .header {
@@ -11,10 +11,23 @@ h1 {
     font-style: oblique;
 }
 
-.descricaoSerie {
-    margin-bottom: 0px;
+.thead-tabela-series-topo {
+    background: whitesmoke;
 }
 
-.datacCadastroSerie {
-    margin-bottom: 0px;
+.thead-tabela-series-footer {
+    background: whitesmoke;
+}
+
+.td-coluna-acoes-tabela-series {
+    width: 11%;
+}
+
+#btn-destroy {
+    display: inline !important;
+}
+
+
+#btn-update {
+    display: inline !important;
 }
