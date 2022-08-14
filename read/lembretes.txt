@@ -517,7 +517,11 @@ herdado da view componetizado de form
 ================================================================================================================================================================================
 mod 03
 
-#
+# Aprendemos a validar os dados de uma requisição
+# Vimos que podemos ter várias regras de validação para cada campo
+# Entendemos como podemos exibir todos os erros de validação em nossas views
+# Aprendemos a extrair um FormRequest para melhorar nosso código
+# Vimos como traduzir as mensagens de erro
 
 -----------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------

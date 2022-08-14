@@ -7,7 +7,7 @@
             Listar Séries
             </x-slot>
 
-            <a href="{{ route('series.create') }}" class="btn btn-info mb-4" tabindex="-1" role="button"
+            <a href="{{ route('series.create') }}" class="btn btn-warning mb-4" tabindex="-1" role="button"
                 aria-disabled="true" title="Criar Nova Série">Registrar</a>
 
             <table class="table table-hover">
