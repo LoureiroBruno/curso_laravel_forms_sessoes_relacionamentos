@@ -39,10 +39,14 @@ class SeriesController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->input('nome') == null) {
-            return redirect('series')->with("danger", "Há dados não informados, tente novamente!");
-        }
+        // if ($request->input('nome') == null) {
+        //     return redirect('series')->with("danger", "Há dados não informados, tente novamente!");
+        // }
 
+        /** validação do campo nome */
+        $request->validate([
+            'nome' => ['required','min:3']
+        ]);
         $serie = Serie::create($request->all());
 
         return to_route('series.index')->with("success", "Cadastrado a série: '{$serie->nome}' com sucesso!");
@@ -73,6 +77,7 @@ class SeriesController extends Controller
 
     public function update(Request $request, Serie $series)
     {
+        /** atualizar registro de acordo com id passado por parametro */
         // if ($series != null) {
         //     $series->where('id', $series->id)->update(['nome' => $request->nome]);
 

@@ -154,7 +154,10 @@ aplica as rotas, tendo que inserir apenas os nones das rotas nas actions do tipo
 ================================================================================================================================================================================
 mod 02
 
-#
+# Aprendemos a utilizar o método destroy para remover dados do banco
+# Entendemos como usar session com Laravel
+# Utilizamos session para exibir flash messages
+# Entendemos melhor sobre injeção de dependência com Laravel
 
 -----------------------------------------------------------------------------------------------------------------------------------
 
@@ -490,8 +493,80 @@ mod 03
 #
 
 -----------------------------------------------------------------------------------------------------------------------------------
-##
+---------------------------------
+ 01
+---------------------------------
 
+## através do recurso de vadidação do lavarvel validate, torna mais simples no seus uso com relação ao um if por exemplo.
+Só que imagina que eu tenha várias regras, o nome não pode ser nulo, ele tem que ter pelo menos 3 caracteres, a descrição também precisa ouvir. Eu ia encher o meu código de if,
+ou esse if ia ficar muito grande. Além disso, eu ia acabar tendo que repetir tudo isso.
+
+# Mas como eu crio essa validação?
+Eu tenho um array de regras, e nessas regras eu informo que o meu “nome” tem tais regras, por exemplo, ’nome’ => ‘required’, ele é obrigatório.
+E eu poderia ter outras regras, por exemplo, ele tem um número mínimo de caracteres, qual é o número mínimo?
+Três caracteres, então ’nome’ => ‘required|min:3’.
+
+## Então, eu posso fazer várias regras, separando por “ | “. Só que uma sintaxe que eu prefiro, que não era aceita em versões antigas do Laravel, mas já é há algum tempo,
+posso utilizar um array, então ’nome’ => [‘required’, min:3’]. Então dessa forma, eu tenho o meu array de regras. De novo, eu tenho uma validação para o meu campo nome, em que ele
+é obrigatório, e preciso de pelo menos 3 caracteres.
+
+## entao nesse exemplo de validação simples ao inserir num formulario com o campo nome vazio, é redirecionado de volta ao formulario.
+poŕem precisa ser melhor tratado essa validação tendo um fedback com o usuário.
+
+---------------------------------
+ 04
+---------------------------------
+
+Então, eu comentei no vídeo anterior, que caso a validação não passe, o Laravel retorna uma resposta de redirecionamento para a página anterior.
+E além disso, na flash message, ele adiciona todas as informações do request que não foi válido. Então conseguimos acessar o request.
+mas se estivéssemos criando uma API, essa resposta de redirecionamento não seria interessante. Então, o que Laravel faz, é ao invés de retornar uma resposta de redirecionamento,
+ele retorna um JSON já com as mensagens de erro para nós.
+
+ O que acontece? Quando temos uma validação que falha, além de adicionar todos os campos, todo o input, todo o request no flash, ele também adiciona todos os erros, as mensagens de erro.
+ E existe um detalhe por trás do Laravel, que transforma todos esses erros em uma variável já disponível para nós, chamada errors. Inclusive, na documentação neste link.
+ já tem um HTML pronto para mostrar todas as mensagens de erro que existirem.
+
+ view:
+
+ @if ($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
+desta fica desnecessário essa verificação:
+
+controlador:
+if ($request->input('nome') == null) {
+    return redirect('series')->with("danger", "Há dados não informados, tente novamente!");
+}
+
+view:
+@elseif (session('danger'))
+    <div class="alert alert-danger">
+        <img src="{{ asset('img/info.svg') }}" />
+        {{ session('danger') }}
+    </div>
+@endif
+
+## Então, com isso, já começamos a brincar com as validações, só que eu comentei que, de novo, além das mensagens de erro, o Laravel também coloca na flash toda a requisição.
+Então, se eu quiser preencher esse campo, eu posso fazer da seguinte forma, eu vou para a view de create, e lembra que posso informar o nome de alguma forma?
+Esse nome vai vir da minha sessão, vai vir da minha requisição anterior.
+E para isso, o Laravel nos fornece uma função chamada old. Essa função pega da flash session, daquela sessão que dura uma vez só, a requisição anterior, que foi adicionada pela validação.
+Assim, como eu tenho toda essa minha requisição, posso pegar o campo chamado “nome”.
+
+Então, com isso, se eu adicionar somente um “A” no nome da série no navegador, tento inserir, ele volta e já preenche para nós. na ideia de facilitar a correção
+Só que então entra um outro detalhe, que talvez você já perceba, vou inspecionar,e repara que agora eu acabei atualizando, estou tentando mandar esse novo formulário
+com o valor do método como put.
+
+ <x-series.form action="{{ route('series.store') }}" nome="{{ old('nome') }}" />
+
+ ## Ou seja, como se eu estivesse atualizando uma série existente. Então, preciso mudar aquela nossa lógica. No form, ao invés de verificar se o nome existe, vou simplesmente fazer um if,
+ se o update existe e é verdadeiro, então @id($update).
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ================================================================================================================================================================================

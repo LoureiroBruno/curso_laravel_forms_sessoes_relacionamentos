@@ -6,16 +6,6 @@
             Listar Séries
             </x-slot>
 
-            @if (session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-            @elseif (session('danger'))
-                <div class="alert alert-danger">
-                    {{ session('danger') }}
-                </div>
-            @endif
-
             <a href="{{ route('series.create') }}" class="btn btn-primary btn-sm mb-4" tabindex="-1" role="button"
                 aria-disabled="true">Adicionar</a>
 
@@ -24,6 +14,7 @@
                     <tr class="th-tabela-series">
                         <th scope="col">#</th>
                         <th scope="col">Descrição</th>
+                        <th scope="col">Detalhes</th>
                         <th scope="col">Data de Inscrição</th>
                         <th scope="col">Data de Edição</th>
                         <th scope="col">Ações</th>
@@ -34,6 +25,11 @@
                         <tr>
                             <th scope="row">{{ $serie->id }}</th>
                             <td>{{ $serie->nome }}</td>
+                            <td>
+                                <button type="button" class="btn btn-link">
+                                    <img src="{{ asset('img/detalhes.svg') }}" />
+                                </button>
+                            </td>
                             <td>{{ $serie->created_at }}</td>
                             <td>{{ $serie->updated_at }}</td>
                             <td class="td-coluna-acoes-tabela-series">
@@ -62,8 +58,9 @@
                     <tr class="th-tabela-series">
                         <th scope="col">#</th>
                         <th scope="col">Descrição</th>
-                        <th scope="col">Inscrito</th>
-                        <th scope="col">Atualizado</th>
+                        <th scope="col">Detalhes</th>
+                        <th scope="col">Data de Inscrição</th>
+                        <th scope="col">Data de Edição</th>
                         <th scope="col">Ações</th>
                     </tr>
                 </thead>

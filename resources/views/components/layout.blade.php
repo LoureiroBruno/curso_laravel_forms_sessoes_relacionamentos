@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,10 +9,38 @@
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <link rel="stylesheet" href="{{ asset('css/layout.css') }}">
 </head>
+
 <body>
     <div class="container">
-        <h1><p class="header">{{ $header }}</p></h1>
+        <h1>
+            <p class="header">{{ $header }}</p>
+        </h1>
+
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        @if (session('success'))
+            <div class="alert alert-success">
+                <img src="{{ asset('img/check-lg.svg') }}" />
+                {{ session('success') }}
+
+            </div>
+        @elseif (session('danger'))
+            <div class="alert alert-danger">
+                <img src="{{ asset('img/info.svg') }}" />
+                {{ session('danger') }}
+            </div>
+        @endif
+
         {{ $slot }}
     </div>
 </body>
+
 </html>
