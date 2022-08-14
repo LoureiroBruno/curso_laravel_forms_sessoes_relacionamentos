@@ -27,7 +27,7 @@
                             <td>{{ $serie->nome }}</td>
                             <td>
                                 <button type="button" class="btn btn-link">
-                                    <img src="{{ asset('img/detalhes.svg') }}" />
+                                    <img class="img-tabela-series" src="{{ asset('img/detalhes.svg') }}" />
                                 </button>
                             </td>
                             <td>{{ $serie->created_at }}</td>

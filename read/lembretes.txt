@@ -278,6 +278,33 @@ view
             @endisset
 
 
+
+****
+outras forma de execução
+****
+
+public function update(Request $request, Serie $series)
+    {
+        /** atualizar registro de acordo com id passado por parametro */
+        // if ($series != null) {
+        //     $series->where('id', $series->id)->update(['nome' => $request->nome]);
+        //     return to_route('series.index')->with("success", "Atualizado a série: '{$request->nome}' com sucesso!");
+        // } else {
+        //     return redirect('series')->with("danger", "Há dados não informados, tente novamente!");
+        // }
+
+        /** mais simples */
+        if ($request->nome == null) {
+            return to_route('series.index')->with("danger", "Não foi possível realizar atualização de cadastro");
+        }
+
+        $series->fill($request->all());
+        $series->save();
+        return to_route('series.index')->with("success", "Atualizado a série: '{$series->nome}' com sucesso!");
+    }
+
+****
+
 ---------------------------------
  07
 ---------------------------------
@@ -609,6 +636,47 @@ Posso, ao invés de utilizar o request genérico do Laravel, criar o meu própri
 vamos utilizar o Artisan, # php artisan make:request SeriesFormRequest.
 Isso cria uma classe de request para nós. E eu informo o nome dessa classe, ou seja, uma requisição de um formulário de série, que tem as informações de uma série.
 
+Ele vai criar para nós, posso subir o meu Artisan Serve de novo. E onde que esse Request foi criado?
+Ele foi criado na pasta “App > http > requests”,e dentro dela, a nossa classe já estende um FormRequest do Laravel.
+com isso posso implementar essa classe recem criada coma as regras de validação, a onde quiser.
+Pois toda a requisição será enviada a classe criada SeriesFormRequest e dela será tratada com as implementações da Classe Request.Porém usa ela ao inves da Classe Request
+
+## desabilitar a regra de autenticação na classe SeriesFormRequest
+
+## Agora, se eu quiser modificar essas mensagens, podemos fazer de duas formas, uma é no próprio FormRequest. Imagina que eu queira uma mensagem personalizada para o nome de uma série.
+Então, quando tem qualquer erro com o nome de uma série, quero uma mensagem personalizada.
+Eu posso implementar o método messages. Ele retorna um array com todas as mensagens que eu posso utilizar. Então, por exemplo, se eu tiver qualquer erro com o nome, por exemplo, ’nome.required’,
+ou seja, se a regra required não for satisfeita para o campo nome, eu posso exibir a mensagem “O campo nome é obrigatório”, então ’nome.required’ => ‘O campo nome é obrigatório’.
+Então, eu poderia ter, por exemplo, ’nome.min’ => ‘O campo nome precisa de pelo menos 3 caracteres’, que é a regra min do campo nome, vai gerar essa mensagem.
+Só que esse 3 é configurável, poderia mudar de 3 para 2, então eu posso utilizar o atributo :min para informar, então ’nome.min’ => ‘O campo nome precisa de pelo menos :min caracteres’
+
+public function messages()
+{
+    return [
+        'nome.required' => 'O campo nome é obrigatório',
+        'min' => 'O campo nome requer no mínimo de :min caracteres'
+    ];
+}
+
+Se quiser criar uma mensagem personalizada para todos os erros de nome, basta usar:
+
+public function messages()
+{
+    return [
+        'nome.required' => 'O campo nome é obrigatório e precisa no mímino de 3 caracteres',
+    ];
+}
+
+então a ideias da função messeges é personalizar as mensagem dos metodos especificos para mensagens especificas. pq no caso não criando o metodo messages irá tudo funcionar
+mas com o reorno das mensagens no modelo padrão do framework que no caso ainda em ingles.
+
+## mas se no caso é apenas traduzir as mensagens de retorno, sem necessáriamente personalizar.
+pode ir na pasta lang e baixar as traduções. ou ir na pasta config e no arquivo de configuração do app e na opção locale que por padrão esta em locale='en'
+ou uma outra maneira não muito recomenda acessar a pasta lang/en/validation.php e alterar o conteudo das mensagem nos atributos estabelecidos no framework.
+
+exemplo: eu posso colocar
+’required => ‘O campo :atribute é obrigatório’.
+’string’ => ‘O campo :atribute precisa ter pelo menos :min caracteres.’.
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ================================================================================================================================================================================

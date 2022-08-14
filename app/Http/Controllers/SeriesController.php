@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\SeriesFormRequest;
 use App\Models\Serie;
 use Illuminate\Http\Request;
 
@@ -37,16 +38,8 @@ class SeriesController extends Controller
      * @param Request $request
      * @return void
      */
-    public function store(Request $request)
+    public function store(SeriesFormRequest $request)
     {
-        // if ($request->input('nome') == null) {
-        //     return redirect('series')->with("danger", "Há dados não informados, tente novamente!");
-        // }
-
-        /** validação do campo nome */
-        $request->validate([
-            'nome' => ['required','min:3']
-        ]);
         $serie = Serie::create($request->all());
 
         return to_route('series.index')->with("success", "Cadastrado a série: '{$serie->nome}' com sucesso!");
@@ -68,24 +61,14 @@ class SeriesController extends Controller
 
     public function edit(Serie $series)
     {
-        // $series = $series->find($series->id);
         return view('series.edit')->with(
                                             ['series'=> $series]
                                         );
     }
 
 
-    public function update(Request $request, Serie $series)
+    public function update(SeriesFormRequest $request, Serie $series)
     {
-        /** atualizar registro de acordo com id passado por parametro */
-        // if ($series != null) {
-        //     $series->where('id', $series->id)->update(['nome' => $request->nome]);
-        //     return to_route('series.index')->with("success", "Atualizado a série: '{$request->nome}' com sucesso!");
-        // } else {
-        //     return redirect('series')->with("danger", "Há dados não informados, tente novamente!");
-        // }
-
-        /** mais simples */
         if ($request->nome == null) {
             return to_route('series.index')->with("danger", "Não foi possível realizar atualização de cadastro");
         }
