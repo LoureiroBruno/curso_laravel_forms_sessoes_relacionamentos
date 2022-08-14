@@ -29,11 +29,11 @@ class SeriesFormRequest extends FormRequest
         ];
     }
 
-    public function messages()
-    {
-        return [
-            'nome.required' => 'O campo nome é obrigatório',
-            'min' => 'O campo nome requer no mínimo de :min caracteres'
-        ];
-    }
+    // public function messages()
+    // {
+    //     return [
+    //         'nome.required' => 'O campo nome é obrigatório',
+    //         'min' => 'O campo nome requer no mínimo de :min caracteres'
+    //     ];
+    // }
 }

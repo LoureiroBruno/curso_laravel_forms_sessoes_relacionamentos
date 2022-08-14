@@ -1,6 +1,7 @@
 <x-layout>
     <x-slot:title>
-        Series - Listar Itens
+        {{-- Series - Listar Itens --}}
+        {{ __('messages.app_name') }}
         </x-slot>
         <x-slot:header>
             Listar Séries
