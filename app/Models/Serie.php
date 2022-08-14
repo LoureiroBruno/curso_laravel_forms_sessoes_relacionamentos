@@ -13,4 +13,15 @@ class Serie extends Model
     [
         'nome',
     ];
+
+    /**
+     * seasons function - temporadas
+     *
+     * @return void
+     */
+    public function seasons()
+    {
+        /** Uma seria possue muitas temporadas */
+        return $this->hasMany(related: Season::class, foreignKey:'series_id');
+    }
 }

@@ -687,10 +687,85 @@ exemplo: eu posso colocar
 ================================================================================================================================================================================
 mod 04
 
-#
+Aprendemos sobre os tipos de relacionamentos do Eloquent
+Criamos os relacionamentos de nossas models
+Aprendemos a utilizar escopos
+Conhecemos o conceito de eager loading com Eloquent
 
 -----------------------------------------------------------------------------------------------------------------------------------
-##
+
+---------------------------------
+ 02
+---------------------------------
+
+## aso você já tenha feito os cursos de Doctrine, por exemplo, você lembra que temos entidades que não dependem do ORM, elas só têm algumas anotações ou atributos.
+Pois existem uma outra classe EntityManager que gerencia as entidades e seus relacionamentos.
+no nosso caso, nossa entidade, que é uma classe normal do PHP, teríamos um atributo de temporadas, por exemplo, algo como private array $temporadas;. E até poderíamos especificar que esse
+array é de temporadas.
+Então teríamos algo parecido com esse código. E poderíamos ter um método getter, para acessar as temporadas. Só que como já comentei, o Eloquent ORM utiliza um padrão diferente, ele não
+utiliza esse data maper, esse mapeamento de dados. Assim, se fosse o caso, inclusive, eu teria um private string $nome.
+Mas para definirmos um relacionamento com o Eloquent ORM, nós não vamos criar uma propriedade nova, nós vamos criar um método de relacionamento.
+Só que antes de criarmos o relacionamento entre série e uma temporada, por exemplo, preciso ter essa temporada. Então vamos criar as models de temporada e de episódio.
+Então vou abrir o meu terminal, vou interromper o meu Artisan Serve, e vou rodar php artisan make:model Season -m e ao invés de chamar de temporada, eu vou começar a escrever em inglês,
+então vai ser season.
+
+# php artisan make:model Season -m (-m já cria a migration referente a model Season)
+# php artisan make:model Season -m (-m já cria a migration referente a model Season)
+
+## Vamos dar uma olhada em Season.php. Eu tenho a model de temporada e a model de episódio. Então vamos voltar para a série, Serie.php. Em algum momento que tenha a série, eu quero poder acessar suas temporadas.
+Mas eu já falei que eu não vou criar essa propriedade, então para acessar, vou criar um método de relacionamento.
+
+Então eu vou criar um public function temporadas() e o nome desse método é o nome pelo qual eu quero acessar esse relacionamento. Se quando eu tiver uma série, eu quiser acessar temporadas,
+vou criar um método chamado temporadas.
+
+simples assim, tenho um método de relacionamento, e ele precisa retornar alguma forma de relacionamento. E temos várias. No caso, uma série tem várias temporadas, posso simplesmente escrever isso em inglês, dizendo que essa série has many,
+ou seja, “tem muitas temporadas”, no nosso caso, “season”, return $this->hasMany(related: Season::class);.
+Então, o que isso está fazendo, ele está informando que uma série vai ter um relacionamento com a model de temporada do tipo 1 para muitos. Uma série possui várias temporadas.
+
+public function seasons()
+{
+    /** Uma seria para muitas temporadas */
+    return $this->hasMany(related: Season::class);
+}
+
+Inclusive, posso fazer o relacionamento inverso também,
+posso dizer que uma temporada pertence a alguma série, então eu vou criar um método de série, ou no caso, como estamos escrevendo em inglês, series, public functon series().
+Embora isso seja singular, termina com “s” por causa do inglês.
+
+
+Mas enfim, essa temporada tem uma série, ela pertence a uma série. Posso retornar informando que return $this->belongsTo(Serie::class). Relacionamento definido.
+
+Agora, uma temporada tem também muitos episódios, então vamos lá, public function episodes(), e eu posso definir no retorno return $this->hasMany(Episode::class). Mesma coisa na classe de episódio, eu posso mapear a temporada, então public function season(),
+que vai retornar return $this->belongsTo(Season::class).
+
+
+Com isso, tenho todas as minhas models com os seus relacionamentos definidos
+
+---------------------------------
+ 04
+---------------------------------
+
+E vamos ver alguns detalhes. Primeiro, ele está montando a query, utilizando como chave estrangeira uma coluna chamada ”serie_id”, só que eu quero começar a escrever em inglês, então vai ser ”series_id”, ou seja, vai ter um “s” no final. O que eu posso fazer?
+No relacionamento de série com temporadas, além de informar com qual classe ela vai se relacionar, posso informar qual nome da chave estrangeira, no caso vai ser ”series_id”.
+
+public function seasons()
+{
+    /** Uma seria possue muitas temporadas */
+    return $this->hasMany(related: Season::class, foreignKey:'series_id');
+}
+
+ Com isso, se eu atualizar, ele já passa a utilizar a coluna ”series_id”. Assim, conseguimos personalizar o nosso modelo do banco de dados. Caso eu precisasse fazer com que essa chave estrangeira referencie uma coluna na minha tabela, que não é a minha chave primária,
+ eu poderia informar o último parâmetro localKey.
+
+
+public function seasons()
+{
+    /** Uma seria possue muitas temporadas */
+    return $this->hasMany(related: Season::class, foreignKey:'series_id', localkey:'id');
+}
+
+##  Entendido mais ou menos, mesmo que por cima, os tipos de relacionamentos.
+
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
