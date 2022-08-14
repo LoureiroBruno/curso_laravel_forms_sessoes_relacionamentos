@@ -80,10 +80,8 @@ class SeriesController extends Controller
         /** atualizar registro de acordo com id passado por parametro */
         // if ($series != null) {
         //     $series->where('id', $series->id)->update(['nome' => $request->nome]);
-
         //     return to_route('series.index')->with("success", "Atualizado a série: '{$request->nome}' com sucesso!");
         // } else {
-
         //     return redirect('series')->with("danger", "Há dados não informados, tente novamente!");
         // }
 

@@ -563,10 +563,52 @@ Então, com isso, se eu adicionar somente um “A” no nome da série no navega
 Só que então entra um outro detalhe, que talvez você já perceba, vou inspecionar,e repara que agora eu acabei atualizando, estou tentando mandar esse novo formulário
 com o valor do método como put.
 
- <x-series.form action="{{ route('series.store') }}" nome="{{ old('nome') }}" />
+<x-series.form action="{{ route('series.store') }}" :nome="old('nome')"/>
 
+## poŕem na regra de negocio a aplicação apartir do momento que possue um valor na imput passar de update ao inves de um create
+ao inves de verificar se existe um valor para um nome, e faz a veriifacao se é update É TRUE nas view principal form. pois na view de create seta com update true
  ## Ou seja, como se eu estivesse atualizando uma série existente. Então, preciso mudar aquela nossa lógica. No form, ao invés de verificar se o nome existe, vou simplesmente fazer um if,
  se o update existe e é verdadeiro, então @id($update).
+
+ porém como as duas viwes compartilham ou usam do mesmo componente form, e cada um view possume metodos diferente foi alterando a logica do funcionamento do componente form
+
+<form action={{ $action }} method="POST">
+    @csrf
+    {{-- @isset($nome) --}}
+        @if ($update)
+            @method('PUT')
+        @endif
+    {{-- @endisset --}}
+
+    <div class="mb-3">
+        <label for="nome" class="form-label">Nome</label>
+        <input type="text" class="form-control" id="nome" name="nome" placeholder="Nome de Descrição Série"
+            @isset($nome) value="{{ $nome }}" @endisset>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-outline-primary btn-sm mb-3">Salvar</button>
+        <a href="{{ route('series.index') }}" class="btn btn-outline-danger btn-sm mb-3 ms-2" tabindex="-1"
+            role="button" aria-disabled="true">Cancelar</a>
+    </div>
+</form>
+
+acrescentando na view edit
+
+  // <x-series.form action="{{ route('series.update', $series->id) }}" nome="{{ $series->nome }}" />
+  <x-series.form action="{{ route('series.update', $series->id) }}" nome="{{ $series->nome }}" :update="true" />
+
+
+---------------------------------
+ 06
+---------------------------------
+
+realizado a validação dos campos vindos do formulario da view create que é repassado ao metodo store, realizado a validaçao dos campos.
+porém se quiser implementar a mesma regra de validação para a view de edit e respectivamente no seu metodo update
+teria que copiar do metodo create?
+Posso, ao invés de utilizar o request genérico do Laravel, criar o meu próprio request e já informar todas as regras necessárias.
+vamos utilizar o Artisan, # php artisan make:request SeriesFormRequest.
+Isso cria uma classe de request para nós. E eu informo o nome dessa classe, ou seja, uma requisição de um formulário de série, que tem as informações de uma série.
+
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ================================================================================================================================================================================
