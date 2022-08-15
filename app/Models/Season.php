@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Season extends Model
 {
@@ -18,7 +17,7 @@ class Season extends Model
     public function series()
     {
         /** A temporada percentecem  a uma serie */
-        return $this->BelongsTo(Serie::class);
+        return $this->BelongsTo(Series::class);
     }
 
     /**

@@ -745,7 +745,7 @@ Com isso, tenho todas as minhas models com os seus relacionamentos definidos
  04
 ---------------------------------
 
-E vamos ver alguns detalhes. Primeiro, ele está montando a query, utilizando como chave estrangeira uma coluna chamada ”serie_id”, só que eu quero começar a escrever em inglês, então vai ser ”series_id”, ou seja, vai ter um “s” no final. O que eu posso fazer?
+E detalhes. Primeiro, ele está montando a query, utilizando como chave estrangeira uma coluna chamada ”serie_id”, só que eu quero começar a escrever em inglês, então vai ser ”series_id”, ou seja, vai ter um “s” no final. O que eu posso fazer?
 No relacionamento de série com temporadas, além de informar com qual classe ela vai se relacionar, posso informar qual nome da chave estrangeira, no caso vai ser ”series_id”.
 
 public function seasons()
@@ -764,9 +764,202 @@ public function seasons()
     return $this->hasMany(related: Season::class, foreignKey:'series_id', localkey:'id');
 }
 
+O padrão é sempre ID? O padrão é o que definimos em $primaryKey, que por padrão, é ID, mas eu poderia alterar isso para ser ”series_id”, por exemplo. Que isso seria chave primária da minha tabela de séries.
+
+## relacionamentos possíveis que o Eloquent fornece:
+
+** "one to one": um relacionamento de um para um, por exemplo, um usuário possui um endereço, e se essas models realmente existem de forma independente, ou seja, em tabelas diferentes, preciso usar o relacionamento On To One
+OBS:: "one to one" semelhante "has One Throught"
+
+** "one to many":
+um para muitos, em que uma série possui várias temporadas. Uma temporada tem vários episódios. E cada um desses relacionamentos possui o inverso. Então, o inverso do One To Many, é o Belongs To, uma temporada pertence a uma série, um episódio pertence a uma temporada.
+OBS:: "one to many" semelhante "has Many Throught"
+
+** "many to many":
+é o de muitos para muitos, por exemplo, na Alura, um aluno pode fazer vários cursos, e um curso pode ter vários alunos matriculados, isso é o Many To Many. Inclusive, precisamos de uma tabela intermediária para fazer isso
+
+
+"Through":
+Esses relacionamentos do tipo Through são iguais ao seus parentes, vamos dizer assim, então por exemplo, Has One é parecido com o One To One e Has Many é parecido com o One To Many,
+só que esse Through significa que existe uma outra tabela envolvida nesse relacionamento, e podemos passar por ela.
+
+Por exemplo, imagina que temos um mecânico, esse mecânico trabalha em um carro, e esse carro tem um dono, eu consigo a partir do mecânico, acessar o dono do carro através desse relacionamento
+de Has One Through
+
 ##  Entendido mais ou menos, mesmo que por cima, os tipos de relacionamentos.
+## vamos criar a migration,
+dentro da model season verificando. O que uma season tem?
+Ela já tem o seu ID, ela tem os timestamps, quando a season foi criada. Agora, vou ter também algum INTEIRO para fazer o RELACIONAMENTO com o ID da Serie.
+
+ó que o que acontece?,
+dentro da MODEL serie, quando eu tenho esse ID, como é o caso da minha série, esse ID cria uma coluna do tipo bigIncrement, e ele usa esse tipo unsignedBigInteger.
+O que isso quer dizer?
+É um tipo inteiro maior e só positivo.
+
+Então, se vamos fazer um relacionamento com esse tipo de coluna, vamos criar também um unsignedBigInteger dentro da MODEL Season.
+Então vamos chamar de ”series_id”, e ele não vai ser autoincrement, é só isso. tendo um relacionamento entre as MODEL de Season e MODEL Serie,
 
 
+** onde dentro da model season
+
+ public function up()
+    {
+        Schema::create('seasons', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('series_id'); onde a coluna series_id se relaciona com coluna id da model Serie
+            $table->timestamps();
+        });
+    }
+
+
+ tenho a minha coluna de series_id, mas eu não tenho aquela minha chave estrangeira. Para eu criar a chave estrangeira, eu posso utilizar o método foreign.
+ Então, a minha series_id é uma chave estrangeira, que referencia a coluna ID na tabela, ou seja, on(table: ‘series’).
+
+ $table->foreign('series_id')->references('id')->on('series');
+
+  public function up()
+    {
+        Schema::create('seasons', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('series_id'); onde a coluna series_id se relaciona com coluna id da model Serie
+             $table->foreign('series_id')->references('id')->on('series');
+            $table->timestamps();
+        });
+    }
+
+## finalizando o relacionamento entre temporadas e séries. Mas repare que isso é bastante verboso. Para facilitar um pouco, o Laravel fornece essa outra sintaxe,
+que é o $table->foreignID(column: ‘series_id’)->constrained.
+
+Essa parte: $table->foreignID(column: ‘series_id’)
+cria o campo que é unsignedBigInteger com esse nome.
+
+E essa parte: ->constrained
+faz o relacionamento, ele pega o nome do campo e referência uma coluna ID, a chave primária da tabela que estamos nos relacionando.
+
+    public function up()
+    {
+        Schema::create('seasons', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedTinyInteger('numero');
+            $table->foreignId('series_id')->constrained();
+            $table->timestamps();
+        });
+    }
+
+--------------------------------
+Se todos os nossos valores forem padrão ou corretamente configurados, podemos usar também o método foreignIdFor (que existe desde o Laravel 8)
+ que recebe por parâmetro o nome da model ao invés do nome da coluna. Um exemplo, nesse nosso caso, seria:
+
+$table->foreignIdFor(Serie::class)->constrained();
+
+mas no nosso exemplo:
+
+Nesse caso nós acabaríamos tendo a coluna como serie_id ao invés de series_id.
+Entao, Podemos ainda passar um segundo parâmetro para esse método, ficando:
+
+$table->foreignIdFor(Serie::class, ‘series_id’)->constrained();
+--------------------------------
+
+
+## Se ao invés de acessar a propriedade;
+  public function edit(Serie $series)
+    {
+        dd($series->seasons);
+        return view('series.edit')->with(
+                                            ['series'=> $series]
+                                        );
+    }
+acessar o metodo
+
+public function edit(Serie $series)
+{
+    dd($series->seasons());
+    return view('series.edit')->with(
+                                        ['series'=> $series]
+                                    );
+}
+
+obtem o acesso ao relacionamento.
+com isso tendo acesso ao relacionamento, consigo modificar a query, por exemplo, adicionar um campo, fazer um filtro por esse relacionamento. Então,
+quero pegar dessa minha série somente a temporada com o ID 1, ou seja, dd($series->temporadas()->whereId()->get());, enfim, eu consigo modificar essa query e no final fazer um get.
+
+** propriedade e metodo
+uma propriedade, eu acesso a coleção, já pego as temporadas. Se eu acessar através do método tenho o relacionamento, o query builder, ou seja, uma possibilidade de filtrar isso,
+para depois pegar a coleção.
+
+
+---------------------------------
+ 06
+---------------------------------
+
+primeiro realizado a condição dentro do controlador SerieController no metodo index, listar o campo nome de ordem crescente
+
+/**
+* list series function
+*
+* @return string
+*/
+public function index()
+{
+
+/** configurado na model Serie o metodo booted orderBy */
+$series = Serie::orderBy('nome', 'asc')->get();
+return view('series.index')->with('series', $series);
+
+}
+
+então criando escopos do tipo global.
+criado um metodo booted dentro da MODEL usada Serie, contruindo com mesma condição de ordernar de forma crescente no campo nome e repasando ao controlador SerieController o filtro já
+estabelecido
+
+na model:
+
+/**
+    * The "booted" method of the model.
+    *
+    * @return void
+    */
+protected static function booted()
+{
+    static::addGlobalScope('ordered', function (Builder $builder) {
+        $builder->orderBy('nome');
+    });
+}
+
+no controller refatorado
+
+/**
+* list series function
+*
+* @return string
+*/
+public function index()
+{
+
+/** recebendo do model Serie ordenado por nome asc */
+$series = Serie::all();
+
+return view('series.index')->with('series', $series);
+
+}
+
+criando espoco local
+E o que acontece, existem outras formas de adicionarmos escopos, eu poderia, por exemplo, imagina que tenho usuários e quero ver somente os usuários ativos.
+Eu posso criar um escopo local, chamado scopeActive, por exemplo, e esse escopo vai receber também um query builder, então public function scopeActive(Builder $query),
+e ele vai retornar essa query com algum filtro, por exemplo, return $query->qhere(column: ‘active’, operator: true), e é igual a true ou 1, ou o campo que você quiser buscar no banco de dados.
+
+## na abordagem de como trazer os demais dados com as model realacionadas, iŕa depender da necessidade, seguindo o projeto criado.
+Eu tenho em minha série, as temporadas, sempre que quiser buscar uma série, essa série virá sem suas temporadas, e se tento acessar, só então o Eloquent busca as temporadas no banco.
+O nome disso é lazy loading, para que eu não precise ficar buscando dados que são desnecessários.
+Mas se em todo o momento precisar ficar indo as temporadas dessa série, vou na próxima série, busco as temporadas, imagina que na minha view, na minha index, onde eu estou exibindo os nomes das séries,
+também estou exibindo quantas temporadas tenho.
+
+## então o mais indicado é buscar tudo de uma vez dentro de um limite de qantidade de itens, como a paginação.
+em uma busca das minhas séries, por exemplo, trazer as séries com as temporadas, posso fazer isso através do método with. O controller poderia fazer com o método with,
+então $series = Serie::with(‘temporadas’), então posso passar todos os relacionamentos que quero adicionar. E isso vai nos retornar o nosso query builder, então eu posso buscar.
+
+Isso, nessa nossa página, vai gerar o mesmo resultado, só que com uma perda de performance, porque agora eu estou acessando as temporadas que inicialmente não precisava.
+Mas, esse código vai continuar funcionando. E guanha performance depois evitando que seja executado varias consulta dentero daquela paginação na busca por temporadas(season)
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ================================================================================================================================================================================
@@ -776,8 +969,16 @@ mod 05
 #
 
 -----------------------------------------------------------------------------------------------------------------------------------
-##
+## refatorando o codigo, indo ate as mogrations e reescrevendo as migrations de season e episodes
+Quando eu excluir uma série, quero garantir que ele também vai excluir as temporadas, os episódios. Então no nosso constrain, vou dizer que ondDelete(‘cascade’). Ou seja,
+quando eu deletar uma série também vou deletar todas as suas temporadas.
 
+ $table->foreignId('series_id')->constrained()->onDelete('cascade');
+
+ O ideal não seria criar uma nova migration?
+ Seria, só que no meu caso vou zerar a minha base de dados, vou recriar todas as migrations, então não vai ter problema, podemos recriar tudo.
+
+ # php artisan migrate:fresh
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ================================================================================================================================================================================

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\SeriesFormRequest;
-use App\Models\Serie;
+use App\Models\Series;
 use Illuminate\Http\Request;
 
 class SeriesController extends Controller
@@ -13,10 +13,13 @@ class SeriesController extends Controller
      *
      * @return string
      */
-    public function index(Request $request)
+    public function index()
     {
-        // $series = Serie::all();
-        $series = Serie::orderBy('nome', 'asc')->get();
+        /** configurado na model Serie o metodo booted orderBy */
+        // $series = Serie::orderBy('nome', 'asc')->get();
+
+        /** recebendo do model Serie ordenado por nome asc */
+        $series = Series::all();
 
         return view('series.index')->with('series', $series);
 
@@ -40,13 +43,13 @@ class SeriesController extends Controller
      */
     public function store(SeriesFormRequest $request)
     {
-        $serie = Serie::create($request->all());
+        $serie = Series::create($request->all());
 
         return to_route('series.index')->with("success", "Cadastrado a série: '{$serie->nome}' com sucesso!");
 
     }
 
-    public function destroy(Serie $series)
+    public function destroy(Series $series)
     {
         if ($series == null) {
             return to_route('series.index')->with("danger", "Não foi possível realizar exlusão de cadastro");
@@ -59,15 +62,16 @@ class SeriesController extends Controller
     }
 
 
-    public function edit(Serie $series)
+    public function edit(Series $series)
     {
+        // dd($series->seasons());
         return view('series.edit')->with(
                                             ['series'=> $series]
                                         );
     }
 
 
-    public function update(SeriesFormRequest $request, Serie $series)
+    public function update(SeriesFormRequest $request, Series $series)
     {
         if ($request->nome == null) {
             return to_route('series.index')->with("danger", "Não foi possível realizar atualização de cadastro");
