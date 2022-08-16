@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\SeriesFormRequest;
+use App\Http\Requests\SeriesFormRequestCreate;
+use App\Http\Requests\SeriesFormRequestUpdate;
 use App\Models\Episode;
 use App\Models\Season;
 use App\Models\Series;
@@ -42,7 +43,7 @@ class SeriesController extends Controller
      * @param Request $request
      * @return void
      */
-    public function store(SeriesFormRequest $request)
+    public function store(SeriesFormRequestCreate $request)
     {
         // dd($request->all());
 
@@ -111,7 +112,7 @@ class SeriesController extends Controller
     }
 
 
-    public function update(SeriesFormRequest $request, Series $series)
+    public function update(SeriesFormRequestUpdate $request, Series $series)
     {
         if ($request->nome == null) {
             return to_route('series.index')->with("danger", "Não foi possível realizar atualização de cadastro");

@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class SeriesFormRequest extends FormRequest
+class SeriesFormRequestUpdate extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,8 +26,6 @@ class SeriesFormRequest extends FormRequest
     {
         return [
             'nome' => ['required','min:3'],
-            // 'seasonQty'=> ['required'],
-            // 'episodesPerSeason' => ['required']
         ];
     }
 
