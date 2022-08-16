@@ -29,6 +29,14 @@ h1 {
     text-align: center;
 }
 
+#td-coluna-acoes-tabela-detalhes-series-season {
+    text-align: start;
+}
+
+#td-coluna-acoes-tabela-detalhes-episodes {
+    text-align: end;
+}
+
 #td-coluna-acoes-tabela-series {
     text-align: end;
 }
@@ -40,4 +48,44 @@ h1 {
 
 #btn-update {
     display: inline !important;
+}
+
+#tabela-series_length {
+    text-align: start !important
+}
+
+#tabela-series_paginate {
+    text-align: end !important;
+}
+
+#tabela-series_filter {
+    text-align: end !important;
+
+}
+
+#tabela-series_next {
+    padding: 10px !important;
+    background: cadetblue !important;
+    border-radius: 60%;
+    margin: 10px;
+    color: white;
+}
+
+#tabela-series_previous {
+    padding: 10px !important;
+    background: cadetblue !important;
+    border-radius: 60%;
+    margin: 10px;
+    color: white;
+}
+
+
+.paginate_button.current {
+    color: black !important;
+    margin: 5px !important;
+}
+
+body
+{
+    margin-bottom: 100px;
 }

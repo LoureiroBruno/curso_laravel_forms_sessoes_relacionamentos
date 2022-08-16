@@ -66,6 +66,8 @@ class SeriesController extends Controller
             $seasons[] = [
                 'series_id' => $serie->id,
                 'number' => $s,
+                'created_at' => $serie->created_at,
+                'updated_at' => $serie->updated_at
             ];
         }
 

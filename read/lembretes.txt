@@ -966,7 +966,9 @@ Mas, esse código vai continuar funcionando. E guanha performance depois evitand
 ================================================================================================================================================================================
 mod 05
 
-#
+# Vimos como uma debugbar pode nos ajudar a depurar a aplicação
+# Aprendemos a otimizar nossa aplicação com Bulk Insert
+# Usamos eager loading para exibir as temporadas com seus episódios
 
 -----------------------------------------------------------------------------------------------------------------------------------
 ## refatorando o codigo, indo ate as mogrations e reescrevendo as migrations de season e episodes
