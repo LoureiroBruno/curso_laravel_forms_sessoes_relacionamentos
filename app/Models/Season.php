@@ -9,6 +9,10 @@ class Season extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'number'
+    ];
+
     /**
      * series function - serie
      *

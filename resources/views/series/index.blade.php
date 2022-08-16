@@ -18,7 +18,7 @@
                         <th scope="col">Detalhes</th>
                         <th scope="col">Data de Inscrição</th>
                         <th scope="col">Data de Edição</th>
-                        <th scope="col">Ações</th>
+                        <th scope="col" class="col-2" id="th-coluna-acoes-tabela-series">Painel de Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -33,7 +33,7 @@
                             </td>
                             <td>{{ $serie->created_at }}</td>
                             <td>{{ $serie->updated_at }}</td>
-                            <td class="td-coluna-acoes-tabela-series">
+                            <td id="td-coluna-acoes-tabela-series">
                                 <div>
                                     <form action="{{ route('series.edit', $serie->id) }}" method="get" id="btn-update">
                                         @csrf
@@ -64,7 +64,7 @@
                         <th scope="col">Detalhes</th>
                         <th scope="col">Data de Inscrição</th>
                         <th scope="col">Data de Edição</th>
-                        <th scope="col">Ações</th>
+                        <th scope="col" class="col-2" id="th-coluna-acoes-tabela-series">Painel de Ações</th>
                     </tr>
                 </thead>
             </table>

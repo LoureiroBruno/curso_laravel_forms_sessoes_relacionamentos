@@ -979,6 +979,9 @@ quando eu deletar uma série também vou deletar todas as suas temporadas.
  Seria, só que no meu caso vou zerar a minha base de dados, vou recriar todas as migrations, então não vai ter problema, podemos recriar tudo.
 
  # php artisan migrate:fresh
+
+ # composer require barryvdh/laravel-debugbar --dev
+
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ================================================================================================================================================================================

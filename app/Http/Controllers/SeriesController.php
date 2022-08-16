@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\SeriesFormRequest;
+use App\Models\Episode;
+use App\Models\Season;
 use App\Models\Series;
 use Illuminate\Http\Request;
 
@@ -43,8 +45,20 @@ class SeriesController extends Controller
      */
     public function store(SeriesFormRequest $request)
     {
+        // dd($request->all());
         $serie = Series::create($request->all());
 
+        for ($s=1; $s <= $request->seasonQty; $s++) {
+            $season = $serie->seasons()->create([
+                'number' => $s
+            ]);
+
+            for ($e=1; $e <= $request->episodesPerSeason; $e++) {
+                $season->episodes()->create([
+                    'number' =>  $e
+                ]);
+            }
+        }
         return to_route('series.index')->with("success", "Cadastrado a série: '{$serie->nome}' com sucesso!");
 
     }
@@ -65,9 +79,10 @@ class SeriesController extends Controller
     public function edit(Series $series)
     {
         // dd($series->seasons());
-        return view('series.edit')->with(
-                                            ['series'=> $series]
-                                        );
+        return view('series.edit')->with([
+            'series'=> $series
+            ]
+        );
     }
 
 

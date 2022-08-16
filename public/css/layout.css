@@ -25,8 +25,12 @@ h1 {
     background: whitesmoke;
 }
 
-.td-coluna-acoes-tabela-series {
-    width: 14%;
+#th-coluna-acoes-tabela-series {
+    text-align: center;
+}
+
+#td-coluna-acoes-tabela-series {
+    text-align: end;
 }
 
 #btn-destroy {
