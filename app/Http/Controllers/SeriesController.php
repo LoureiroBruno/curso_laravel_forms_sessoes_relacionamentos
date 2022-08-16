@@ -24,7 +24,6 @@ class SeriesController extends Controller
         $series = Series::all();
 
         return view('series.index')->with('series', $series);
-
     }
 
     /**
@@ -46,21 +45,45 @@ class SeriesController extends Controller
     public function store(SeriesFormRequest $request)
     {
         // dd($request->all());
+
         $serie = Series::create($request->all());
+        /** executando varias querys */
+        // for ($s = 1; $s <= $request->seasonQty; $s++) {
+        //     $season = $serie->seasons()->create([
+        //         'number' => $s
+        //     ]);
 
+        //     for ($e = 1; $e <= $request->episodesPerSeason; $e++) {
+        //         $season->episodes()->create([
+        //             'number' =>  $e
+        //         ]);
+        //     }
+        // }
+
+        /** executando menos querys */
+        $seasons = [];
         for ($s=1; $s <= $request->seasonQty; $s++) {
-            $season = $serie->seasons()->create([
-                'number' => $s
-            ]);
+            $seasons[] = [
+                'series_id' => $serie->id,
+                'number' => $s,
+            ];
+        }
 
+        Season::insert($seasons);
+
+        $episodes = [];
+        foreach ($serie->seasons as $season) {
             for ($e=1; $e <= $request->episodesPerSeason; $e++) {
-                $season->episodes()->create([
-                    'number' =>  $e
-                ]);
+                $episodes[] = [
+                    'season_id' => $season->id,
+                    'number' => $s,
+                ];
             }
         }
-        return to_route('series.index')->with("success", "Cadastrado a série: '{$serie->nome}' com sucesso!");
 
+        Episode::insert($episodes);
+
+        return to_route('series.index')->with("success", "Cadastrado a série: '{$serie->nome}' com sucesso!");
     }
 
     public function destroy(Series $series)
@@ -72,15 +95,15 @@ class SeriesController extends Controller
         $series->delete();
 
         return to_route('series.index')->with("success", "Excluído o Registro #{$series->id} | nome: '{$series->nome}' com Sucesso!");
-
     }
 
 
     public function edit(Series $series)
     {
         // dd($series->seasons());
-        return view('series.edit')->with([
-            'series'=> $series
+        return view('series.edit')->with(
+            [
+                'series' => $series
             ]
         );
     }
@@ -96,6 +119,4 @@ class SeriesController extends Controller
         $series->save();
         return to_route('series.index')->with("success", "Atualizado a série: '{$series->nome}' com sucesso!");
     }
-
-
 }
