@@ -62,3 +62,32 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## como subir a aplicação
+
+01 clonar o repositorio 
+02 acessar o repositorio
+03 baixar as dependency
+
+## composer install 
+
+04 criar arquivo env
+
+## cp .env.example .env
+
+05 criar banco sqlite
+
+## database.sqlite
+
+06 subir migrations
+
+## php artisan migrate
+
+07 gerar a key projeto
+
+## php artisan key:generate
+
+08 subir a aplicação
+
+## php artisan serve
+
