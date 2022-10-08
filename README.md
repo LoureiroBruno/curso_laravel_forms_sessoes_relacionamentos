@@ -65,11 +65,11 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 ## como subir a aplicação
 
-- 01 clonar o repositorio 
-- 02 acessar o repositorio
-- 03 baixar as dependency
-
-## composer install 
+### clonar o repositorio 
+- git 
+- acessar o repositorio
+- baixar as dependency
+- composer install
 
 04 criar arquivo env
 
